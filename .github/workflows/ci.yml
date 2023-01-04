@@ -1,0 +1,42 @@
+name: Test
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - name: ⏬ Checkout code
+        uses: actions/checkout@v2
+
+      - name: 🔢 Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: ⏬ Install
+        run: |
+          yarn
+          sh src/stage1-download/common.sh
+
+      - name: ✨ Lint
+        run: |
+          yarn lint
+
+      - name: 🧪 Test
+        run: |
+          mkdir -p tmp out
+          yarn test
+        env:
+          FORCE_COLOR: 1
+
+      - name: 📈 Coveralls
+        uses: coverallsapp/github-action@v1.1.2
+        with:
+          github-token: ${{ secrets.github_token }}
+        continue-on-error: true

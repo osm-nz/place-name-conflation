@@ -1,0 +1,59 @@
+{
+  "name": "place-name-conflation",
+  "private": true,
+  "scripts": {
+    "1a": "sh src/stage1-download/common.sh",
+    "1b": "sh src/stage1-download/big.sh",
+    "1": "npm run 1a && npm run 1b",
+    "2": "ts-node src/stage2-preprocess",
+    "3": "ts-node src/stage3-conflate",
+    "4": "ts-node src/stage4-report",
+    "lint": "eslint --ext .ts,.tsx,.js --ignore-path .gitignore . && tsc",
+    "test": "jest"
+  },
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "pbf2json": "^6.10.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "through2": "^4.0.2",
+    "which-polygon": "^2.2.0"
+  },
+  "devDependencies": {
+    "@types/geojson": "^7946.0.10",
+    "@types/jest": "^29.2.5",
+    "@types/node": "^18.11.18",
+    "@types/pbf2json": "^6.6.1",
+    "@types/react": "^18.0.26",
+    "@types/react-dom": "^18.0.10",
+    "@types/through2": "^2.0.38",
+    "@types/which-polygon": "^2.2.0",
+    "eslint": "^8.30.0",
+    "eslint-config-kyle": "^9.22.1",
+    "jest": "^29.3.1",
+    "ts-jest": "^29.0.3",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.4"
+  },
+  "eslintConfig": {
+    "extends": "kyle",
+    "rules": {
+      "camelcase": 0,
+      "no-underscore-dangle": 0,
+      "@typescript-eslint/no-namespace": 0,
+      "@typescript-eslint/no-non-null-assertion": 0
+    }
+  },
+  "prettier": "eslint-config-kyle/prettier",
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testTimeout": 15000,
+    "collectCoverage": true
+  },
+  "engineStrict": true,
+  "engines": {
+    "node": ">=v18.0.0"
+  }
+}

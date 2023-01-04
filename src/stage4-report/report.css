@@ -1,0 +1,47 @@
+body {
+  font-family: sans-serif;
+}
+code {
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.2rem;
+  background: #f2f2f2;
+  font-size: 87.5%;
+}
+code a {
+  text-decoration: none;
+  color: #e83e8c;
+}
+code a:hover {
+  text-decoration: underline;
+}
+
+thead td {
+  font-weight: 400;
+}
+tbody tr:nth-child(odd) {
+  background-color: #f2f2f2;
+}
+
+/* progress bar */
+.progress-bar {
+  display: flex;
+  border-radius: 8px;
+  overflow: hidden;
+  min-width: 400px;
+}
+.progress-bar > div {
+  padding: 4px 0;
+  text-align: center;
+}
+.progress-bar > div:nth-child(1) {
+  background: #2dc937;
+  color: white;
+}
+.progress-bar > div:nth-child(2) {
+  background: #e7b416;
+  color: white;
+}
+.progress-bar > div:nth-child(3) {
+  background: #cc3232;
+  color: white;
+}
