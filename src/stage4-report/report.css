@@ -28,6 +28,7 @@ tbody tr:nth-child(odd) {
   border-radius: 8px;
   overflow: hidden;
   min-width: 400px;
+  height: 26px;
 }
 .progress-bar > div {
   padding: 4px 0;

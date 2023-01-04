@@ -6,18 +6,29 @@ import { OsmPatchFile, StatsFile } from '../types';
 const { format: formatNumber } = new Intl.NumberFormat('en-NZ');
 
 const total = (stats: OsmPatchFile['stats']) =>
-  stats.addCount + stats.editCount + stats.okayCount;
+  stats.addNodeCount + stats.addWayCount + stats.editCount + stats.okayCount;
 
 const ProgressBar: React.FC<{ stats: OsmPatchFile['stats'] }> = ({ stats }) => {
   const okay = Math.floor((stats.okayCount / total(stats)) * 100);
   const edit = Math.floor((stats.editCount / total(stats)) * 100);
+  const add = 100 - okay - edit;
 
   return (
     <div className="progress-bar">
       <div style={{ width: `${okay}%` }}>{formatNumber(stats.okayCount)}</div>
       <div style={{ width: `${edit}%` }}>{formatNumber(stats.editCount)}</div>
-      <div style={{ width: `${100 - okay - edit}%` }}>
-        {formatNumber(stats.addCount)}
+      <div style={{ width: `${add}%` }}>
+        {/* eslint-disable-next-line no-nested-ternary */}
+        {add === 0 ? (
+          0
+        ) : stats.addWayCount === 0 ? (
+          formatNumber(stats.addNodeCount)
+        ) : (
+          <>
+            {formatNumber(stats.addNodeCount)} +{' '}
+            {formatNumber(stats.addWayCount)}
+          </>
+        )}
       </div>
     </div>
   );
@@ -106,12 +117,7 @@ export const Report: React.FC<{ data: StatsFile; css: string }> = ({
                       type
                     )}
                   </td>
-                  <td>
-                    {stats &&
-                      formatNumber(
-                        stats.addCount + stats.editCount + stats.okayCount,
-                      )}
-                  </td>
+                  <td>{stats && formatNumber(total(stats))}</td>
                   <td>
                     <Tags type={type} />
                   </td>

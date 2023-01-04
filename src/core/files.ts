@@ -15,7 +15,11 @@ export const osmPathFilePath = (type: NameType) =>
   join(repoRoot, `out/zzz-${type}.osmPatch.geo.json`);
 
 export const nzgbCsvPath = join(repoRoot, 'tmp/nzgb.csv');
+export const nzgbCsvAreasPath = join(repoRoot, 'tmp/nzgb-areas.csv');
+export const nzgbCsvLinesPath = join(repoRoot, 'tmp/nzgb-areas.csv');
 export const nzgbJsonPath = join(repoRoot, 'tmp/nzgb.json');
+export const nzgbJsonGeometryPath = join(repoRoot, 'tmp/nzgb-geom.json');
+
 export const nzgbIndexPath = join(repoRoot, 'out/index.json');
 export const extraLayersFile = join(repoRoot, 'out/extra-layers.geo.json');
 export const htmlReport = join(repoRoot, 'out/report.html');

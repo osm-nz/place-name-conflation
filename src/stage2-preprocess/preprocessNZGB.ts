@@ -1,7 +1,7 @@
 import { promises as fs, createReadStream } from 'node:fs';
 import csv from 'csv-parser';
 import { NZGBCsv, NZGBSourceData, Ref } from '../types';
-import { overrides, NameType, NZGB_NAME_TYPES } from '../data';
+import { OVERRIDES, NameType, NZGB_NAME_TYPES, IGNORE } from '../data';
 import { nzgbCsvPath, nzgbJsonPath } from '../core';
 import { maybeTeReoName } from './maybeTeReoName';
 
@@ -19,6 +19,7 @@ type TempObject = {
     lng: number;
     type: NameType;
     names: TempName[];
+    isArea: boolean;
   };
 };
 
@@ -33,19 +34,23 @@ async function csvToTemp(): Promise<TempObject> {
         if (!(i % 1000)) process.stdout.write('.');
         i += 1;
 
-        /** cause of that dumb excel character at the start we do this */
+        /** cause of the BOM character at the start of the csv file we do this */
         const nameIdKey = Object.keys(data)[0] as 'name_id';
+        const ref = +data[nameIdKey];
+
+        if (IGNORE.has(ref)) return; // ignore this entry
 
         out[data.feat_id] ||= {
           lat: +data.crd_latitude,
           lng: +data.crd_longitude,
           type: data.feat_type,
           names: [],
+          isArea: data.geom_type !== 'POINT',
         };
 
         out[data.feat_id].names.push({
           name: data.name,
-          ref: +data[nameIdKey],
+          ref,
           // eslint-disable-next-line no-nested-ternary
           status: data.status.startsWith('Official')
             ? 'O'
@@ -109,8 +114,9 @@ async function tempToFinal(temp: TempObject) {
         altNames: altNames.length ? altNames.map((n) => n.name) : undefined,
         oldNames: oldNames.length ? oldNames.map((n) => n.name) : undefined,
 
-        ...overrides[ref],
+        ...OVERRIDES[ref],
       };
+      if (place.isArea) out[ref].isArea = true;
     } else {
       // this feature has no official names
       const names = place.names
@@ -134,8 +140,9 @@ async function tempToFinal(temp: TempObject) {
         nameMi: maybeTeReoName(unofficialTeReoNames),
         oldNames: oldNames.length ? oldNames.map((n) => n.name) : undefined,
 
-        ...overrides[ref],
+        ...OVERRIDES[ref],
       };
+      if (place.isArea) out[ref].isArea = true;
     }
   }
 

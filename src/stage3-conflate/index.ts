@@ -1,9 +1,17 @@
 import { promises as fs } from 'node:fs';
-import { NZGBSourceData, OsmPatchFile, OSMTempFile, StatsFile } from '../types';
+import { Geometry } from 'geojson';
+import {
+  GeometryTmpFile,
+  NZGBSourceData,
+  OsmPatchFile,
+  OSMTempFile,
+  StatsFile,
+} from '../types';
 import { NameType, NZGB_NAME_TYPES, __SKIP } from '../data';
 import {
   extraLayersFile,
   nzgbIndexPath,
+  nzgbJsonGeometryPath,
   nzgbJsonPath,
   osmPathFilePath,
   tempOsmFile,
@@ -13,6 +21,7 @@ import { findMatch } from './findMatch';
 import { isOffShore } from './isOffShore';
 
 let nzgb: NZGBSourceData;
+let nzgbGeom: GeometryTmpFile;
 
 // baseline: this took 120sec on the very first run (1k refs in the planet)
 async function processOneType(type: NameType) {
@@ -20,6 +29,7 @@ async function processOneType(type: NameType) {
   console.log('\tReading files...');
 
   nzgb ||= JSON.parse(await fs.readFile(nzgbJsonPath, 'utf8'));
+  nzgbGeom ||= JSON.parse(await fs.readFile(nzgbJsonGeometryPath, 'utf8'));
   const osm: OSMTempFile = JSON.parse(
     await fs.readFile(tempOsmFile(type), 'utf8'),
   );
@@ -42,7 +52,7 @@ async function processOneType(type: NameType) {
   const output: OsmPatchFile = {
     type: 'FeatureCollection',
     size: 'large',
-    stats: { okayCount: 0, addCount: 0, editCount: 0 },
+    stats: { okayCount: 0, addNodeCount: 0, addWayCount: 0, editCount: 0 },
     features: [],
   };
 
@@ -67,15 +77,17 @@ async function processOneType(type: NameType) {
         if (action) output.features.push(action);
       } else {
         // Case C: We couldn't find a match
-        // So create a new OSM Node
-        // const isOffShore = isOffShore();
+        // So create a new OSM feature. Use the geometry from the LDS
+        // if possible, otherwise add a node.
+
+        const fallbackGeom: Geometry = {
+          type: 'Point',
+          coordinates: [nzgbPlace.lng, nzgbPlace.lat],
+        };
         output.features.push({
           type: 'Feature',
           id: ref,
-          geometry: {
-            type: 'Point',
-            coordinates: [nzgbPlace.lng, nzgbPlace.lat],
-          },
+          geometry: nzgbGeom[+ref.split(';')[0]]?.geom || fallbackGeom,
           properties: {
             ...getPresetTags(nzgbPlace.lat, nzgbPlace.lng),
 
@@ -98,15 +110,20 @@ async function processOneType(type: NameType) {
   for (const item of output.features) {
     if (item.properties.__action) {
       output.stats.editCount += 1;
+    } else if (item.geometry.type === 'Point') {
+      output.stats.addNodeCount += 1;
     } else {
-      output.stats.addCount += 1;
+      output.stats.addWayCount += 1;
     }
   }
   output.stats.okayCount =
-    total - output.stats.editCount - output.stats.addCount;
+    total -
+    output.stats.editCount -
+    output.stats.addNodeCount -
+    output.stats.addWayCount;
 
   console.log(
-    `\tComplete (${output.stats.addCount} missing, ${output.stats.editCount} wrong, ${output.stats.okayCount} okay)\n`,
+    `\tComplete (${output.stats.addNodeCount}+${output.stats.addWayCount} missing, ${output.stats.editCount} wrong, ${output.stats.okayCount} okay)\n`,
   );
   await fs.writeFile(osmPathFilePath(type), JSON.stringify(output, null, 2));
 

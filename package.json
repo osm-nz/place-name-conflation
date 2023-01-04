@@ -5,7 +5,9 @@
     "1a": "sh src/stage1-download/common.sh",
     "1b": "sh src/stage1-download/big.sh",
     "1": "npm run 1a && npm run 1b",
-    "2": "ts-node src/stage2-preprocess",
+    "2a": "ts-node src/stage2-preprocess",
+    "2b": "ts-node src/stage2-preprocess/preprocessGeometry",
+    "2": "npm run 2a && npm run 2b",
     "3": "ts-node src/stage3-conflate",
     "4": "ts-node src/stage4-report",
     "lint": "eslint --ext .ts,.tsx,.js --ignore-path .gitignore . && tsc",
@@ -17,6 +19,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "through2": "^4.0.2",
+    "wellknown": "^0.5.0",
     "which-polygon": "^2.2.0"
   },
   "devDependencies": {
@@ -27,6 +30,7 @@
     "@types/react": "^18.0.26",
     "@types/react-dom": "^18.0.10",
     "@types/through2": "^2.0.38",
+    "@types/wellknown": "^0.5.4",
     "@types/which-polygon": "^2.2.0",
     "eslint": "^8.30.0",
     "eslint-config-kyle": "^9.22.1",

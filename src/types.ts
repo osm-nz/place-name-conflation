@@ -64,6 +64,7 @@ export type NZGBFeature = {
   official?: true;
   altNames?: string[];
   oldNames?: string[];
+  isArea?: true;
 };
 export type NZGBSourceData = {
   [placeId: string]: NZGBFeature;
@@ -95,7 +96,8 @@ export type OsmPatchFile = FeatureCollection<Geometry, Tags> & {
   stats: {
     okayCount: number;
     editCount: number;
-    addCount: number;
+    addNodeCount: number;
+    addWayCount: number;
   };
 };
 
@@ -105,3 +107,10 @@ export type CoastlineFile = FeatureCollection<
   MultiPolygon,
   { ADMIN: string; ISO_A3: string; ISO_A2: string }
 > & { processed?: true };
+
+export type GeometryTmpFile = {
+  [placeId: number]: {
+    name: string;
+    geom: Geometry;
+  };
+};
