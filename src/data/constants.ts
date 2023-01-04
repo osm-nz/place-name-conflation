@@ -32,7 +32,7 @@ const _NZGB_NAME_TYPES = {
   Beach: { tags: { natural: 'beach' } },
   Bend: { tags: { natural: 'peak' } }, // MNAT: McMurdo - american Nunatak
   Bridge: { tags: { man_made: 'bridge' } },
-  Building: { tags: { building: 'yes' } },
+  Building: __SKIP, // only 100 features, all already in OSM, and querying for building=yes is a waste of resources
   Bush: { tags: { natural: 'wood' } }, // this is ambigous, in NZ English this could mean forest or shrubland
   Caldera: { tags: { natural: 'volcano' } },
   Canal: { tags: { natural: 'water', water: 'canal' } },
@@ -100,9 +100,12 @@ const _NZGB_NAME_TYPES = {
     },
   },
   Hill: { tags: { natural: 'peak' } },
-  'Historic Antarctic': { tags: { historic: 'yes' } },
-  'Historic Reserve': { tags: { historic: 'yes' } },
-  'Historic Site': { tags: { historic: 'yes' } },
+  'Historic Antarctic': {
+    tags: { historic: '*' },
+    addTags: { historic: 'yes' },
+  },
+  'Historic Reserve': { tags: { historic: '*' }, addTags: { historic: 'yes' } },
+  'Historic Site': { tags: { historic: '*' }, addTags: { historic: 'yes' } },
   Hole: {
     tags: {
       'seamark:type': 'sea_area',
@@ -122,8 +125,13 @@ const _NZGB_NAME_TYPES = {
   Ledge: { tags: { natural: 'ledge' } },
   'Local Authority': __SKIP,
   Locality: { tags: { place: 'locality' } }, // locality (settlement)
-  'Marine Feature': { tags: { 'seamark:type': 'sea_area' } },
-  'Marine Reserve': { tags: { boundary: 'protected_area' } },
+  'Marine Feature': {
+    tags: {
+      'seamark:type': 'sea_area',
+      'seamark:sea_area:category': 'yes',
+    },
+  },
+  'Marine Reserve': __SKIP, // { tags: { boundary: 'protected_area' } }, // needs to be imported first
   Mound: {
     tags: {
       'seamark:type': 'sea_area',
@@ -132,7 +140,7 @@ const _NZGB_NAME_TYPES = {
   },
   'Mud Volcano': { tags: { natural: 'volcano' } },
   'National Park': __SKIP, // { tags: { boundary: 'protected_area' } }, // needs to be imported first
-  'Nature Reserve': { tags: { leisure: 'nature_reserve' } },
+  'Nature Reserve': __SKIP, // { tags: { leisure: 'nature_reserve' } }, // needs to be imported first
   Pass: { tags: { natural: 'saddle' } }, // mountain pass / saddle
   Peak: {
     tags: {
@@ -166,7 +174,7 @@ const _NZGB_NAME_TYPES = {
   Range: { tags: { natural: 'ridge' } },
   Rapid: { tags: { natural: 'water', water: 'rapids' } },
   Recreation: { tags: { place: 'locality' } }, // named places within ski fields
-  'Recreation Reserve': { tags: { landuse: 'recreation_ground' } },
+  'Recreation Reserve': { tags: { leisure: 'park' } },
   Reef: { tags: { natural: 'reef' } },
   'Reserve (non-CPA)': { tags: { leisure: 'park' } },
   Ridge: {
@@ -299,6 +307,27 @@ const _NZGB_NAME_TYPES = {
   'Wilderness Area': __SKIP, // these should be imported as boundaries first
   'Wildlife Management Area': __SKIP, // these should be imported as boundaries first
 } satisfies TypeMap;
+
+// this what we query the OSM planet file for, since it's cheaper to do one overly generous
+// query than 40 specific queries. There will be a whole load of irrelevant crap returned for
+// broad queries like `natural=*` but we have to live with that.
+export const TOP_LEVEL_TAGS = [
+  'natural',
+  'place',
+  'historic',
+  'waterway~waterfall',
+  'leisure~park',
+  'man_made~bridge',
+  'man_made~survey_point',
+  'railway~yard',
+  'railway~station',
+  'route~railway',
+  'seamark:sea_area:category',
+  'desert~yes',
+  'ford~yes',
+  'junction~yes',
+  'historic~yes',
+];
 
 export const NZGB_NAME_TYPES: TypeMap = _NZGB_NAME_TYPES;
 

@@ -10,6 +10,7 @@ import {
 import { NameType, NZGB_NAME_TYPES, __SKIP } from '../data';
 import {
   extraLayersFile,
+  findTopLevelTag,
   nzgbIndexPath,
   nzgbJsonGeometryPath,
   nzgbJsonPath,
@@ -20,19 +21,15 @@ import { compareFeatures } from './compareFeatures';
 import { findMatch } from './findMatch';
 import { isOffShore } from './isOffShore';
 
-let nzgb: NZGBSourceData;
-let nzgbGeom: GeometryTmpFile;
-
 // baseline: this took 120sec on the very first run (1k refs in the planet)
-async function processOneType(type: NameType) {
+function processOneType(
+  type: NameType,
+  nzgb: NZGBSourceData,
+  nzgbGeom: GeometryTmpFile,
+  osm: OSMTempFile,
+) {
   console.log(type);
   console.log('\tReading files...');
-
-  nzgb ||= JSON.parse(await fs.readFile(nzgbJsonPath, 'utf8'));
-  nzgbGeom ||= JSON.parse(await fs.readFile(nzgbJsonGeometryPath, 'utf8'));
-  const osm: OSMTempFile = JSON.parse(
-    await fs.readFile(tempOsmFile(type), 'utf8'),
-  );
 
   console.log('\tConflating...');
 
@@ -46,6 +43,29 @@ async function processOneType(type: NameType) {
     }
     return isOffShore(lat, lng) ? typeDef.subseaTags : typeDef.onLandTags;
   };
+
+  // find the top level tag(s) to use. If there is a different tagging scheme
+  // for on land vs subsea, then we merge two categories together
+  let osmCategory: OSMTempFile[string];
+  if ('tags' in typeDef) {
+    const preset = findTopLevelTag(typeDef.tags);
+    if (!preset) throw new Error('Preset error run `yarn 2`');
+    osmCategory = osm[preset];
+  } else {
+    const landPreset = findTopLevelTag(typeDef.onLandTags);
+    const subseaPreset = findTopLevelTag(typeDef.subseaTags);
+    if (!landPreset || !subseaPreset) {
+      throw new Error('Preset error run `yarn 2`');
+    }
+
+    osmCategory = {
+      noRef: [...osm[landPreset].noRef, ...osm[subseaPreset].noRef],
+      withRef: {
+        ...osm[landPreset].withRef,
+        ...osm[subseaPreset].withRef,
+      },
+    };
+  }
 
   let total = 0;
 
@@ -62,15 +82,15 @@ async function processOneType(type: NameType) {
 
     total += 1;
 
-    if (osm.withRef[ref]) {
+    if (osmCategory.withRef[ref]) {
       // Case A: there is already a OSM feature with the ref:linz:place_id tag
-      const action = compareFeatures(ref, nzgbPlace, osm.withRef[ref]);
+      const action = compareFeatures(ref, nzgbPlace, osmCategory.withRef[ref]);
       if (action) output.features.push(action);
 
-      delete osm.withRef[ref]; // so that we can check which refs in OSM aren't in the NZGB dataset
+      delete osmCategory.withRef[ref]; // so that we can check which refs in OSM aren't in the NZGB dataset
     } else {
       // there is no OSM feature with a ref, so try to search by name
-      const matchFound = findMatch(nzgbPlace, osm.noRef);
+      const matchFound = findMatch(nzgbPlace, osmCategory.noRef);
       if (matchFound) {
         // Case B: We think we've found a match
         const action = compareFeatures(ref, nzgbPlace, matchFound);
@@ -125,12 +145,19 @@ async function processOneType(type: NameType) {
   console.log(
     `\tComplete (${output.stats.addNodeCount}+${output.stats.addWayCount} missing, ${output.stats.editCount} wrong, ${output.stats.okayCount} okay)\n`,
   );
-  await fs.writeFile(osmPathFilePath(type), JSON.stringify(output, null, 2));
 
   return output;
 }
 
 async function main() {
+  const nzgb: NZGBSourceData = JSON.parse(
+    await fs.readFile(nzgbJsonPath, 'utf8'),
+  );
+  const nzgbGeom: GeometryTmpFile = JSON.parse(
+    await fs.readFile(nzgbJsonGeometryPath, 'utf8'),
+  );
+  const osm: OSMTempFile = JSON.parse(await fs.readFile(tempOsmFile, 'utf8'));
+
   const statsObj: Partial<StatsFile> = {};
   const extraLayersObj: Record<string, OsmPatchFile> = {};
   for (const _type in NZGB_NAME_TYPES) {
@@ -139,7 +166,11 @@ async function main() {
     if (obj === __SKIP) {
       statsObj[type] = null;
     } else {
-      const osmPatch = await processOneType(type);
+      const osmPatch = processOneType(type, nzgb, nzgbGeom, osm);
+      await fs.writeFile(
+        osmPathFilePath(type),
+        JSON.stringify(osmPatch, null, 2),
+      );
       const layerName = `ZZ Place Names - ${type}`;
       extraLayersObj[layerName] = osmPatch;
       statsObj[type] = osmPatch.stats;

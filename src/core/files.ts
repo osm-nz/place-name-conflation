@@ -6,13 +6,12 @@ const repoRoot = join(__dirname, '../..');
 export const coastlineFile = join(repoRoot, 'tmp/coastline.geo.json');
 export const englishDictFile = join(repoRoot, 'tmp/englishDictionary.json');
 
-export const mainlandPlanetFile = join(repoRoot, 'tmp/osm.pbf');
-
-export const tempOsmFile = (type: NameType) =>
-  join(repoRoot, `tmp/spam/osm-${type}.json`);
+export const planetFileWest = join(repoRoot, 'tmp/osm-west.pbf');
+export const planetFileEast = join(repoRoot, 'tmp/osm-east.pbf');
+export const tempOsmFile = join(repoRoot, 'tmp/osm.json');
 
 export const osmPathFilePath = (type: NameType) =>
-  join(repoRoot, `out/zzz-${type}.osmPatch.geo.json`);
+  join(repoRoot, `out/spam/${type}.osmPatch.geo.json`);
 
 export const nzgbCsvPath = join(repoRoot, 'tmp/nzgb.csv');
 export const nzgbCsvAreasPath = join(repoRoot, 'tmp/nzgb-areas.csv');

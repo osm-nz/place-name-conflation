@@ -77,10 +77,12 @@ export type OSMFeature = {
   tags: Tags;
 };
 export type OSMTempFile = {
-  withRef: {
-    [ref: string]: OSMFeature;
+  [topLevelTag: string]: {
+    withRef: {
+      [ref: string]: OSMFeature;
+    };
+    noRef: OSMFeature[];
   };
-  noRef: OSMFeature[];
 };
 
 /** format of the `ref:linz:place_id` tag */

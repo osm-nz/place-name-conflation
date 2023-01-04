@@ -2,9 +2,7 @@
   "name": "place-name-conflation",
   "private": true,
   "scripts": {
-    "1a": "sh src/stage1-download/common.sh",
-    "1b": "sh src/stage1-download/big.sh",
-    "1": "npm run 1a && npm run 1b",
+    "1": "sh src/stage1-download/index.sh",
     "2a": "ts-node src/stage2-preprocess",
     "2b": "ts-node src/stage2-preprocess/preprocessGeometry",
     "2": "npm run 2a && npm run 2b",

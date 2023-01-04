@@ -1,18 +1,27 @@
 import { promises as fs } from 'node:fs';
-import pbf2json, { Item, Tags } from 'pbf2json';
+import pbf2json, { Item } from 'pbf2json';
 import through from 'through2';
 import { OSMFeature, OSMTempFile } from '../types';
-import { NameType, NZGB_NAME_TYPES, __SKIP } from '../data';
-import { mainlandPlanetFile, tempOsmFile } from '../core';
+import { NameType, NZGB_NAME_TYPES, TOP_LEVEL_TAGS, __SKIP } from '../data';
+import {
+  findTopLevelTag,
+  planetFileEast,
+  planetFileWest,
+  tempOsmFile,
+} from '../core';
 
-async function osmToJson(query: string): Promise<OSMTempFile> {
+/* eslint-disable no-param-reassign -- returns nothing, mutates the first argument instead */
+async function osmToJson(
+  out: OSMTempFile,
+  query: string,
+  planetFile: string,
+): Promise<void> {
   return new Promise((resolve, reject) => {
     let i = 0;
-    const out: OSMTempFile = { withRef: {}, noRef: [] };
 
     pbf2json
       .createReadStream({
-        file: mainlandPlanetFile,
+        file: planetFile,
         tags: [query],
         leveldb: '/tmposm',
       })
@@ -31,81 +40,63 @@ async function osmToJson(query: string): Promise<OSMTempFile> {
             lng: +coords.lon,
             tags: item.tags,
           };
+
+          // doing this search several million times sucks
+          const topLevelTag = findTopLevelTag(item.tags);
+
+          if (!topLevelTag) {
+            throw new Error(`Couldn't find top level tag for ${feature.osmId}`);
+          }
+
+          out[topLevelTag] ||= { withRef: {}, noRef: [] };
           if (id) {
-            out.withRef[id] = feature;
+            out[topLevelTag].withRef[id] = feature;
           } else {
-            out.noRef.push(feature);
+            out[topLevelTag].noRef.push(feature);
           }
 
           next();
         }),
       )
       .on('finish', () => {
-        resolve(out);
+        resolve();
         console.log(`\n\tdone (${i})`);
       })
       .on('error', reject);
   });
 }
-
-const tagsToQuery = (tags: Tags) =>
-  `${Object.entries(tags)
-    .map(([k, v]) => (v === '*' ? k : `${k}~${v}`))
-    .join('+')}+name`; // only search for features with a name
+/* eslint-enable */
 
 export async function preprocesOSM(): Promise<void> {
   const queries: Record<string, NameType[]> = {};
 
-  for (const type in NZGB_NAME_TYPES) {
-    const v = NZGB_NAME_TYPES[type as NameType];
+  let anyErrors = false;
+  for (const _type in NZGB_NAME_TYPES) {
+    const type = _type as NameType;
+    const v = NZGB_NAME_TYPES[type];
     if (v === __SKIP) continue; // eslint-disable-line no-continue -- skip
 
-    let query;
+    const tags = 'tags' in v ? v.tags : { ...v.onLandTags, ...v.subseaTags };
 
-    if ('tags' in v) {
-      query = tagsToQuery(v.tags);
+    const topLevelTag = findTopLevelTag(tags);
+
+    if (topLevelTag) {
+      queries[topLevelTag] ||= [];
+      queries[topLevelTag].push(type);
     } else {
-      query = [tagsToQuery(v.onLandTags), tagsToQuery(v.subseaTags)].join(',');
-    }
-
-    // to speed up the search, simplify these all into one query
-    // since there are so few features
-    if (query.includes('seamark:type~sea_area')) {
-      query = 'seamark:type~sea_area+name';
-    }
-
-    queries[query] ||= [];
-    queries[query].push(type as NameType);
-  }
-
-  let i = 0;
-  for (const query in queries) {
-    i += 1;
-    const count = `${i}/${Object.keys(queries).length}`;
-
-    let anyMissing = false;
-    for (const type of queries[query]) {
-      const exists = await fs
-        .access(tempOsmFile(type))
-        .then(() => true)
-        .catch(() => false);
-      if (!exists) anyMissing = true;
-    }
-    if (!anyMissing) {
-      console.log(
-        `[${count}] Skipping ${query} (${queries[query].join(', ')})`,
-      );
-      continue; // eslint-disable-line no-continue
-    }
-
-    console.log(
-      `[${count}] Searching planet for ${query} (${queries[query].join(', ')})`,
-    );
-
-    const res = await osmToJson(query);
-
-    for (const type of queries[query]) {
-      await fs.writeFile(tempOsmFile(type), JSON.stringify(res));
+      console.error(`Query in preprocesOSM.ts doesn't consider ${type}`);
+      anyErrors = true;
     }
   }
+
+  if (anyErrors) process.exit(1);
+
+  const query = TOP_LEVEL_TAGS.map((tag) => `${tag}+name`).join(',');
+
+  console.log('The query is:', query);
+
+  const out: OSMTempFile = {};
+  await osmToJson(out, query, planetFileWest);
+  await osmToJson(out, query, planetFileEast);
+  await fs.writeFile(tempOsmFile, JSON.stringify(out));
 }
