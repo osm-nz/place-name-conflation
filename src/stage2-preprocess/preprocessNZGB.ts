@@ -1,9 +1,10 @@
 import { promises as fs, createReadStream } from 'node:fs';
 import csv from 'csv-parser';
-import { NZGBCsv, NZGBSourceData, Ref } from '../types';
+import { EtymologyReport, NZGBCsv, NZGBSourceData, Ref } from '../types';
 import { OVERRIDES, NameType, NZGB_NAME_TYPES, IGNORE } from '../data';
-import { nzgbCsvPath, nzgbJsonPath } from '../core';
+import { etymologyReportPath, nzgbCsvPath, nzgbJsonPath, toCSV } from '../core';
 import { maybeTeReoName } from './maybeTeReoName';
+import { parseNameEtymology } from './parseNameEtymology';
 
 export type TempName = {
   name: string;
@@ -11,6 +12,7 @@ export type TempName = {
   /** Oficicial, replaced, or unofficial */
   status: 'O' | 'R' | 'U';
   teReo: boolean;
+  etymology: string | 0xbad | undefined;
 };
 type TempObject = {
   // we group by physical feature id in this temp structure
@@ -24,9 +26,13 @@ type TempObject = {
   };
 };
 
-async function csvToTemp(): Promise<TempObject> {
+async function csvToTemp(): Promise<{ out: TempObject; ety: EtymologyReport }> {
   return new Promise((resolve, reject) => {
     const out: TempObject = {};
+    const ety: EtymologyReport = {
+      stats: { okay: 0, failed: 0, skipped: 0 },
+      list: [],
+    };
     let i = 0;
 
     createReadStream(nzgbCsvPath)
@@ -50,6 +56,12 @@ async function csvToTemp(): Promise<TempObject> {
           isUndersea: data.gebco === 'Y' || data.gebco === 'N', // i.e. column is not blank
         };
 
+        const etymology = parseNameEtymology(data.info_origin, data.name, ref);
+        ety.list.push([ref, data.name, etymology, data.info_origin]);
+        if (etymology === 0xbad) ety.stats.skipped += 1;
+        else if (etymology) ety.stats.okay += 1;
+        else ety.stats.failed += 1;
+
         out[data.feat_id].names.push({
           name: data.name,
           ref,
@@ -60,10 +72,11 @@ async function csvToTemp(): Promise<TempObject> {
             ? 'R'
             : 'U',
           teReo: data.maori_name === 'Yes',
+          etymology,
         });
       })
       .on('end', () => {
-        resolve(out);
+        resolve({ out, ety });
         console.log(`\npart 1 done (${i})`);
       })
       .on('error', reject);
@@ -105,6 +118,8 @@ async function tempToFinal(temp: TempObject) {
         throw new Error('More than 2 official names');
       }
 
+      const mainName = place.names.find((x) => x.ref === +ref.split(';')[0]);
+
       out[ref] = {
         lat: place.lat,
         lng: place.lng,
@@ -118,6 +133,9 @@ async function tempToFinal(temp: TempObject) {
 
         ...OVERRIDES[ref],
       };
+      if (mainName?.etymology && mainName.etymology !== 0xbad) {
+        out[ref].etymology = mainName.etymology;
+      }
       if (place.isArea) out[ref].isArea = true;
       if (place.isUndersea) out[ref].isUndersea = true;
     } else {
@@ -168,7 +186,30 @@ async function tempToFinal(temp: TempObject) {
 export async function preprocessNZGB(): Promise<void> {
   console.log('Preprocessing NZGB data...');
   const temp = await csvToTemp();
-  const res = await tempToFinal(temp);
+  const res = await tempToFinal(temp.out);
   await fs.writeFile(nzgbJsonPath, JSON.stringify(res, null, 2));
+
+  // hack to move the errors to the end
+  temp.ety.list.sort((a) => +!!a[2] || -1);
+  await fs.writeFile(
+    etymologyReportPath,
+    toCSV(temp.ety.list.filter((x) => typeof x[2] !== 'number')),
+  );
+
+  // print etymology stats
+  const total =
+    temp.ety.stats.okay + temp.ety.stats.failed + temp.ety.stats.skipped;
+  const skippedPct = Math.round((temp.ety.stats.skipped / total) * 100);
+  const okayPct = Math.round(
+    (temp.ety.stats.okay / (temp.ety.stats.okay + temp.ety.stats.failed)) * 100,
+  );
+  console.log(
+    '\nEtymologies:',
+    skippedPct,
+    `% have no info. Of the remaining ${100 - skippedPct}%,`,
+    okayPct,
+    '% were parsed.\n',
+  );
+
   console.log('Preprocessing NZGB data complete.');
 }

@@ -2,7 +2,13 @@ import { maybeTeReoName } from '../maybeTeReoName';
 import { TempName } from '../preprocessNZGB';
 
 const $ = (...names: string[]): TempName[] =>
-  names.map((name) => ({ name, teReo: true, ref: 0, status: 'O' }));
+  names.map((name) => ({
+    name,
+    teReo: true,
+    ref: 0,
+    status: 'O',
+    etymology: undefined,
+  }));
 
 describe('maybeTeReoName', () => {
   it.each`

@@ -67,6 +67,7 @@ export type NZGBFeature = {
   oldNames?: string[];
   isArea?: true;
   isUndersea?: true;
+  etymology?: string;
 };
 export type NZGBSourceData = {
   [placeId: string]: NZGBFeature;
@@ -112,4 +113,14 @@ export type GeometryTmpFile = {
     name: string;
     geom: Geometry;
   };
+};
+
+export type EtymologyReport = {
+  stats: { okay: number; failed: number; skipped: number };
+  list: [
+    ref: number,
+    name: string,
+    result: string | undefined | 0xbad,
+    originInfo: string,
+  ][];
 };

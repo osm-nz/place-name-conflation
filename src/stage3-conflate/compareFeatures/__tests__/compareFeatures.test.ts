@@ -82,6 +82,33 @@ describe('compareFeatures', () => {
     ).toStrictEqual({ 'ref:linz:place_id': '26242' });
   });
 
+  it("adds name:etymology if it's mising", () => {
+    expect(
+      conflateTags(
+        { name: 'Arundel', etymology: 'Arendelle' },
+        { name: 'Arundel' },
+      ),
+    ).toStrictEqual({ 'name:etymology': 'Arendelle' });
+  });
+
+  it("doesn't override name:etymology if it's already in OSM", () => {
+    expect(
+      conflateTags(
+        { name: 'Arundel', etymology: 'Arendelle' },
+        { name: 'Arundel', 'name:etymology': 'some existing value' },
+      ),
+    ).toBeUndefined();
+  });
+
+  it("doesn't add name:ety if name:ety:wikidata already in OSM", () => {
+    expect(
+      conflateTags(
+        { name: 'Arundel', etymology: 'Arendelle' },
+        { name: 'Arundel', 'name:etymology:wikidata': 'Q60429821' },
+      ),
+    ).toBeUndefined();
+  });
+
   describe('preset tag changes', () => {
     it('can fix the preset tags', () => {
       expect(

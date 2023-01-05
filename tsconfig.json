@@ -4,6 +4,7 @@
     "strict": true,
     "noEmit": true,
     "skipLibCheck": true,
+    "downlevelIteration": true,
     "lib": ["es2022"],
     "jsx": "react"
   },

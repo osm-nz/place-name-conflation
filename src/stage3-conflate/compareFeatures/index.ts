@@ -77,6 +77,16 @@ export function compareFeatures(
   // 7. Check that it has the right tags from the preset.
   Object.assign(tagChanges, checkTagsFromFeaturePreset(nzgb, osm));
 
+  // 8. Check `name:etymology`. If there is already a value in OSM, we respect that,
+  //    even if it's different to the value we deduced.
+  if (
+    nzgb.etymology &&
+    !osm.tags['name:etymology'] &&
+    !osm.tags['name:etymology:wikidata']
+  ) {
+    tagChanges['name:etymology'] = nzgb.etymology;
+  }
+
   //
   // END OF CHECKS
   //

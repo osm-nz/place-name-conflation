@@ -9,3 +9,15 @@ export const findTopLevelTags = (tags: Tags) =>
     }
     return tag in tags;
   });
+
+export const toCSV = (doubleArray: (string | number | undefined)[][]): string =>
+  doubleArray
+    .map((row) =>
+      row.map((_cell) => {
+        const cell = `${_cell ?? '❌'}`.replace(/"/g, '""');
+        const quoted =
+          cell.includes(',') || cell.includes('"') ? `"${cell}"` : cell;
+        return quoted.replace(/\n/g, '↩');
+      }),
+    )
+    .join('\n');
