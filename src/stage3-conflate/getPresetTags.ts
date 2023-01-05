@@ -2,7 +2,6 @@ import assert from 'node:assert';
 import type { Tags } from 'pbf2json';
 import type { NZGBFeature } from '../types';
 import { NZGB_NAME_TYPES, __SKIP } from '../data';
-import { isOffShore } from './isOffShore';
 
 export function getPresetTags(place: NZGBFeature): { all: Tags; match: Tags } {
   const preset = NZGB_NAME_TYPES[place.type];
@@ -15,7 +14,7 @@ export function getPresetTags(place: NZGBFeature): { all: Tags; match: Tags } {
     };
   }
 
-  return isOffShore(place.lat, place.lng)
+  return place.isUndersea
     ? { all: preset.subseaTags, match: preset.subseaTags }
     : { all: preset.onLandTags, match: preset.onLandTags };
 }

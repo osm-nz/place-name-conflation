@@ -22,7 +22,7 @@ jobs:
       - name: ⏬ Install
         run: |
           yarn
-          sh src/stage1-download/common.sh
+          sh src/stage1-download/index.sh
 
       - name: ✨ Lint
         run: |

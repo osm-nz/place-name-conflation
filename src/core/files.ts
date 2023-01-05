@@ -3,7 +3,6 @@ import type { NameType } from '../data';
 
 const repoRoot = join(__dirname, '../..');
 
-export const coastlineFile = join(repoRoot, 'tmp/coastline.geo.json');
 export const englishDictFile = join(repoRoot, 'tmp/englishDictionary.json');
 
 export const planetFileWest = join(repoRoot, 'tmp/osm-west.pbf');

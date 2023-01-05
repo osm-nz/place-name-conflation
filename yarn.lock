@@ -920,7 +920,7 @@
   resolved "https://registry.yarnpkg.com/@types/estree/-/estree-0.0.51.tgz#cfd70924a25a3fd32b218e5e420e6897e1ac4f40"
   integrity sha512-CuPgU6f3eT/XgKKPqKd/gLZV1Xmvf1a2R5POBOGQa6uv82xpls89HU5zKeVoyR8XzHd1RGNOlQlvUe3CFkjWNQ==
 
-"@types/geojson@*", "@types/geojson@^7946.0.10":
+"@types/geojson@^7946.0.10":
   version "7946.0.10"
   resolved "https://registry.yarnpkg.com/@types/geojson/-/geojson-7946.0.10.tgz#6dfbf5ea17142f7f9a043809f1cd4c448cb68249"
   integrity sha512-Nmh0K3iWQJzniTuPRcJn5hxXkfB1T1pgB89SBig5PlJQU5yocazeu4jATJlaA0GYFKWMqDdvYemoSnF2pXgLVA==
@@ -996,11 +996,6 @@
   resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.7.5.tgz#5f19d2b85a98e9558036f6a3cacc8819420f05cf"
   integrity sha512-JCB8C6SnDoQf0cNycqd/35A7MjcnK+ZTqE7judS6o7utxUCg6imJg3QK2qzHKszlTjcj2cn+NwMB2i96ubpj7w==
 
-"@types/rbush@*":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@types/rbush/-/rbush-3.0.0.tgz#b6887d99b159e87ae23cd14eceff34f139842aa6"
-  integrity sha512-W3ue/GYWXBOpkRm0VSoifrP3HV0Ni47aVJWvXyWMcbtpBy/l/K/smBRiJ+fI8f7shXRjZBiux+iJzYbh7VmcZg==
-
 "@types/react-dom@^18.0.10":
   version "18.0.10"
   resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-18.0.10.tgz#3b66dec56aa0f16a6cc26da9e9ca96c35c0b4352"
@@ -1043,14 +1038,6 @@
   version "0.5.4"
   resolved "https://registry.yarnpkg.com/@types/wellknown/-/wellknown-0.5.4.tgz#1f12a2ca9cda236673272688b7549a30f0c9e3bb"
   integrity sha512-zcsf4oHeEcvpvWhDOB1+qNK04oFJtsmv7Otb1Vy8w8GAqQkgRrVkI/C76PdwtpiT216aM1SbhkKgKWzGLhHKng==
-
-"@types/which-polygon@^2.2.0":
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/@types/which-polygon/-/which-polygon-2.2.0.tgz#27a3993a4c4dc8283a2813d02af2be86f5fdd221"
-  integrity sha512-AzbxModnltxXMXAmXaId7L1NZOBsRqG0M6JcAPi4GyMFNvHuC2Yo422HyXursFkD+h1mlhHqNxexQ6vWlQ7fIA==
-  dependencies:
-    "@types/geojson" "*"
-    "@types/rbush" "*"
 
 "@types/yargs-parser@*":
   version "20.2.1"
@@ -3213,11 +3200,6 @@ levn@^0.4.1:
     prelude-ls "^1.2.1"
     type-check "~0.4.0"
 
-lineclip@^1.1.5:
-  version "1.1.5"
-  resolved "https://registry.yarnpkg.com/lineclip/-/lineclip-1.1.5.tgz#2bf26067d94354feabf91e42768236db5616fd13"
-  integrity sha512-KlA/wRSjpKl7tS9iRUdlG72oQ7qZ1IlVbVgHwoO10TBR/4gQ86uhKow6nlzMAJJhjCWKto8OeoAzzIzKSmN25A==
-
 lines-and-columns@^1.1.6:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/lines-and-columns/-/lines-and-columns-1.2.4.tgz#eca284f75d2965079309dc0ad9255abb2ebc1632"
@@ -3675,18 +3657,6 @@ queue-microtask@^1.2.2:
   version "1.2.3"
   resolved "https://registry.yarnpkg.com/queue-microtask/-/queue-microtask-1.2.3.tgz#4929228bbc724dfac43e0efb058caf7b6cfb6243"
   integrity sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==
-
-quickselect@^1.0.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/quickselect/-/quickselect-1.1.1.tgz#852e412ce418f237ad5b660d70cffac647ae94c2"
-  integrity sha512-qN0Gqdw4c4KGPsBOQafj6yj/PA6c/L63f6CaZ/DCF/xF4Esu3jVmKLUDYxghFx8Kb/O7y9tI7x2RjTSXwdK1iQ==
-
-rbush@^2.0.1:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/rbush/-/rbush-2.0.2.tgz#bb6005c2731b7ba1d5a9a035772927d16a614605"
-  integrity sha512-XBOuALcTm+O/H8G90b6pzu6nX6v2zCKiFG4BJho8a+bY6AER6t8uQUZdi5bomQc0AprCWhEGa7ncAbbRap0bRA==
-  dependencies:
-    quickselect "^1.0.1"
 
 react-dom@^18.2.0:
   version "18.2.0"
@@ -4303,14 +4273,6 @@ which-boxed-primitive@^1.0.2:
     is-number-object "^1.0.4"
     is-string "^1.0.5"
     is-symbol "^1.0.3"
-
-which-polygon@^2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/which-polygon/-/which-polygon-2.2.0.tgz#e4741c050620e55f932b0355d30327136dc8041d"
-  integrity sha512-P2+zRXPqUsTVm4moH8gm7ZTlLtOemy4+EY8elJohjJNMTNpkXLFrlI7i2zUYJD8zHopgKH5TuBmYXca3ZLtMkg==
-  dependencies:
-    lineclip "^1.1.5"
-    rbush "^2.0.1"
 
 which@^2.0.1:
   version "2.0.2"

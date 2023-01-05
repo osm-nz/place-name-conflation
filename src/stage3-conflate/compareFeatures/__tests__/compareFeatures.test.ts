@@ -109,5 +109,18 @@ describe('compareFeatures', () => {
         ),
       ).toStrictEqual({ 'seamark:type': 'sea_area' });
     });
+
+    it('respects lifecycle prefixes on the preset tags', () => {
+      expect(
+        conflateTags(
+          { name: 'Pūkākī Saddle' },
+          {
+            name: 'Pūkākī Saddle',
+            'seamark:type': undefined,
+            'demolished:seamark:type': 'sea_area',
+          },
+        ),
+      ).toBeUndefined();
+    });
   });
 });

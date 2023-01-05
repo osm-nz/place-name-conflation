@@ -14,4 +14,7 @@ export const IGNORE = new Set([
   138122, // Bellingshausen Basin
   40662, // Tasman Basin
   40232, // Hikurangi Plateau
+
+  // outside of the bbox for oceania + antarctica
+  56588, // Southern Ocean
 ]);

@@ -47,13 +47,14 @@ export function checkTagsFromFeaturePreset(
   nzgb: NZGBFeature,
   osm: OSMFeature,
 ): Tags {
-  // if the preset is place=locality skip this check
-  if (osm.tags.place === 'locality') return {};
-
   const tagChanges: Tags = {};
 
-  const cleanedOsmTags = stripAllLifecyclePrefixes(osm.tags);
   const presetTags = getPresetTags(nzgb);
+
+  // if the preset is place=locality skip this check
+  if (presetTags.all.place === 'locality') return tagChanges;
+
+  const cleanedOsmTags = stripAllLifecyclePrefixes(osm.tags);
 
   for (const [key, value] of Object.entries(presetTags.match)) {
     const isTagWrong =

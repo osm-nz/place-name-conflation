@@ -1,6 +1,7 @@
-# NZGB --> OSM place name conflation
+# NZGB ➡️ OSM place name conflation
 
 [![Test](https://github.com/osm-nz/place-name-conflation/actions/workflows/ci.yml/badge.svg)](https://github.com/osm-nz/place-name-conflation/actions/workflows/ci.yml)
+[![Coverage Status](https://coveralls.io/repos/github/osm-nz/place-name-conflation/badge.svg?branch=main)](https://coveralls.io/github/osm-nz/place-name-conflation?branch=main)
 ![Lines of code](https://img.shields.io/tokei/lines/github/osm-nz/place-name-conflation?color=green)
 
 This repository contains the code that regularly compares place names in [OpenStreetMap](https://openstreetmap.org) with the [New Zealand Geographic Board (Ngā Pou Taunaha o Aotearoa) Gazetteer](https://gazetteer.linz.govt.nz).
@@ -9,7 +10,7 @@ How this works:
 
 - The list of place names is downloaded from the [NZGB](https://gazetteer.linz.govt.nz/gaz.csv)
 - An extract of the OpenStreetMap planet is downloaded (containing only Oceania & Antarctica)
-- The OpenStreetMap planet is compared with the gazetter's data, and any discrepancies are identified and categories
+- The OpenStreetMap planet is compared with the gazetteer, and any discrepancies are identified and categorized
 - The result of the conflation process is converted into a format that allows OpenStreetMap mappers to review each place using the same tools as the [LINZ-to-OSM address import](https://github.com/osm-nz/linz-address-import).
 
 # Setup

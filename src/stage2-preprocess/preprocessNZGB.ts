@@ -20,6 +20,7 @@ type TempObject = {
     type: NameType;
     names: TempName[];
     isArea: boolean;
+    isUndersea: boolean;
   };
 };
 
@@ -46,6 +47,7 @@ async function csvToTemp(): Promise<TempObject> {
           type: data.feat_type,
           names: [],
           isArea: data.geom_type !== 'POINT',
+          isUndersea: data.gebco === 'Y' || data.gebco === 'N', // i.e. column is not blank
         };
 
         out[data.feat_id].names.push({
@@ -117,6 +119,7 @@ async function tempToFinal(temp: TempObject) {
         ...OVERRIDES[ref],
       };
       if (place.isArea) out[ref].isArea = true;
+      if (place.isUndersea) out[ref].isUndersea = true;
     } else {
       // this feature has no official names
       const names = place.names

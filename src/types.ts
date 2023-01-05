@@ -1,4 +1,4 @@
-import type { FeatureCollection, Geometry, MultiPolygon } from 'geojson';
+import type { FeatureCollection, Geometry } from 'geojson';
 import type { Tags } from 'pbf2json';
 import type { NameType } from './data';
 
@@ -34,6 +34,7 @@ export type NZGBCsv = {
   treaty_legislation?: string;
   geom_type: 'POINT' | 'LINE' | 'POLYGON';
   accuracy?: string;
+  /** Y or N means the feature is underwater, blank means it's on land */
   gebco?: 'Y' | 'N';
   region?: string;
   /** year */
@@ -65,6 +66,7 @@ export type NZGBFeature = {
   altNames?: string[];
   oldNames?: string[];
   isArea?: true;
+  isUndersea?: true;
 };
 export type NZGBSourceData = {
   [placeId: string]: NZGBFeature;
@@ -104,11 +106,6 @@ export type OsmPatchFile = FeatureCollection<Geometry, Tags> & {
 };
 
 export type StatsFile = Record<NameType, null | OsmPatchFile['stats']>;
-
-export type CoastlineFile = FeatureCollection<
-  MultiPolygon,
-  { ADMIN: string; ISO_A3: string; ISO_A2: string }
-> & { processed?: true };
 
 export type GeometryTmpFile = {
   [placeId: number]: {
