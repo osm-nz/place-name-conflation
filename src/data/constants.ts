@@ -313,6 +313,14 @@ const _NZGB_NAME_TYPES = {
   'Wildlife Management Area': __SKIP, // these should be imported as boundaries first
 } satisfies TypeMap;
 
+export const DONT_IMPORT_AS_AREA = new Set<NameType>([
+  'Stream', // streams take up >50% of the whole file and they need to be imported separately
+  'Bay',
+  'Suburb',
+  'Town',
+  'City',
+]);
+
 // this what we query the OSM planet file for, since it's cheaper to do one overly generous
 // query than 40 specific queries. There will be a whole load of irrelevant crap returned for
 // broad queries like `natural=*` but we have to live with that.

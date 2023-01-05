@@ -7,14 +7,20 @@ import {
   nzgbJsonGeometryPath,
   simplify,
 } from '../core';
-import { IGNORE, NameType } from '../data';
+import {
+  DONT_IMPORT_AS_AREA,
+  IGNORE,
+  NameType,
+  NZGB_NAME_TYPES,
+  __SKIP,
+} from '../data';
 import { GeometryTmpFile } from '../types';
 
 /** tolerance for https://mourner.github.io/simplify-js */
 const WAY_SIMPLIFICATION = 0.00003;
 
 type GeometryIn = {
-  feat_id: string;
+  name_id: string;
   name: string;
   WKT: string;
   feat_type: NameType;
@@ -31,11 +37,16 @@ async function readCsv(path: string): Promise<GeometryTmpFile> {
         if (!(i % 1000)) process.stdout.write('.');
         i += 1;
 
-        const ref = +data.feat_id;
+        const ref = +data.name_id;
 
         if (IGNORE.has(ref)) return; // ignore this entry
         if (out[ref]) return; // don't waste time processing duplicates
-        if (data.feat_type === 'Stream') return; // skip streams for now
+        if (
+          DONT_IMPORT_AS_AREA.has(data.feat_type) ||
+          NZGB_NAME_TYPES[data.feat_type] === __SKIP
+        ) {
+          return;
+        }
 
         /** cause of the BOM character at the start of the csv file we do this */
         const WKT = data[Object.keys(data)[0] as 'WKT'];

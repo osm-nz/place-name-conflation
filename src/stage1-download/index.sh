@@ -2,7 +2,6 @@ mkdir -p out
 mkdir -p tmp
 mkdir -p out/spam
 cd tmp
-rm -rf countries.geo.json
 rm -rf englishDictionary.json
 rm -rf nzgb.csv
 

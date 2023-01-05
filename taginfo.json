@@ -1,0 +1,66 @@
+{
+  "data_format": 1,
+  "data_url": "https://raw.githubusercontent.com/osm-nz/place-name-conflation/main/taginfo.json",
+  "data_updated": "20230105T000000Z",
+  "project": {
+    "name": "New Zealand Place Names",
+    "description": "Tags used by the New Zealand Place Names project, which regularly updates addresses in OSM based on data from the New Zealand Geographic Board (Ngā Pou Taunaha o Aotearoa).",
+    "project_url": "https://github.com/osm-nz/place-name-conflation",
+    "doc_url": "https://wiki.osm.org/Import/New_Zealand_Place_Names",
+    "icon_url": "https://osm-nz.github.io/img/logo.png",
+    "contact_name": "Kyle Hensel",
+    "contact_email": "message @kylenz on OpenStreetMap"
+  },
+  "tags": [
+    {
+      "key": "ref:linz:place_id",
+      "object_types": ["node", "way", "area", "relation"],
+      "description": "The ID of a place in the New Zealand Gazetteer. Used to conflate place names around New Zealand & Antarctica"
+    },
+    {
+      "key": "name",
+      "object_types": ["node", "way", "area", "relation"]
+    },
+    {
+      "key": "name:mi",
+      "object_types": ["node", "way", "area", "relation"]
+    },
+    {
+      "key": "alt_name",
+      "object_types": ["node", "way", "area", "relation"]
+    },
+    {
+      "key": "alt_name:mi",
+      "object_types": ["node", "way", "area", "relation"]
+    },
+    {
+      "key": "old_name",
+      "object_types": ["node", "way", "area", "relation"]
+    },
+    {
+      "key": "not:name",
+      "object_types": ["node", "way", "area", "relation"]
+    },
+    {
+      "key": "name:etymology",
+      "object_types": ["node", "way", "area", "relation"]
+    },
+    {
+      "key": "name:etymology:wikidata",
+      "object_types": ["node", "way", "area", "relation"]
+    },
+    {
+      "key": "wikidata",
+      "object_types": ["node", "way", "area", "relation"]
+    },
+    {
+      "key": "seamark:type",
+      "value": "sea_area",
+      "object_types": ["node", "way", "area", "relation"]
+    },
+    {
+      "key": "seamark:sea_area:category",
+      "object_types": ["node", "way", "area", "relation"]
+    }
+  ]
+}

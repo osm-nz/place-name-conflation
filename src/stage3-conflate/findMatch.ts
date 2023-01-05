@@ -27,5 +27,6 @@ export function findMatch(
   if (matches[0]?.distance < DISTANCE_THRESHOLD) {
     return matches[0].el;
   }
+
   return undefined;
 }
