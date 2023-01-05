@@ -149,7 +149,12 @@ const _NZGB_NAME_TYPES = {
     },
   },
   Peninsula: { tags: { natural: 'cape' } },
-  Pinnacle: { tags: { natural: 'rock' } },
+  Pinnacle: {
+    tags: {
+      'seamark:type': 'sea_area',
+      'seamark:sea_area:category': 'pinnacle',
+    },
+  },
   Place: { tags: { place: 'locality' } }, // including MPLA: american places around McMurdo
   Plain: {
     tags: {

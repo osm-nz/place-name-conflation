@@ -99,13 +99,16 @@ export const Report: React.FC<{ data: StatsFile; css: string }> = ({
           <tbody>
             {sorted.map(([_type, stats]) => {
               const type = _type as NameType;
+              const done =
+                stats &&
+                Math.floor((stats.okayCount / total(stats)) * 100) === 100;
               return (
                 <tr key={type}>
                   <td>
                     {stats ? <ProgressBar stats={stats} /> : <em>Skipped</em>}
                   </td>
                   <td>
-                    {stats ? (
+                    {stats && !done ? (
                       <a
                         href={osmPathFilePath(type)}
                         target="_blank"

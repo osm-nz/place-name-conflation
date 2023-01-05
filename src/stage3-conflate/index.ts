@@ -10,7 +10,7 @@ import {
 import { NameType, NZGB_NAME_TYPES, __SKIP } from '../data';
 import {
   extraLayersFile,
-  findTopLevelTag,
+  findTopLevelTags,
   nzgbIndexPath,
   nzgbJsonGeometryPath,
   nzgbJsonPath,
@@ -19,7 +19,7 @@ import {
 } from '../core';
 import { compareFeatures } from './compareFeatures';
 import { findMatch } from './findMatch';
-import { isOffShore } from './isOffShore';
+import { getPresetTags } from './getPresetTags';
 
 // baseline: this took 120sec on the very first run (1k refs in the planet)
 function processOneType(
@@ -37,34 +37,31 @@ function processOneType(
   if (typeDef === __SKIP) {
     throw new Error(`Type "${type}" is skipped`);
   }
-  const getPresetTags = (lat: number, lng: number) => {
-    if ('tags' in typeDef) {
-      return { ...typeDef.tags, ...typeDef.addTags };
-    }
-    return isOffShore(lat, lng) ? typeDef.subseaTags : typeDef.onLandTags;
-  };
 
   // find the top level tag(s) to use. If there is a different tagging scheme
   // for on land vs subsea, then we merge two categories together
-  let osmCategory: OSMTempFile[string];
-  if ('tags' in typeDef) {
-    const preset = findTopLevelTag(typeDef.tags);
-    if (!preset) throw new Error('Preset error run `yarn 2`');
-    osmCategory = osm[preset];
-  } else {
-    const landPreset = findTopLevelTag(typeDef.onLandTags);
-    const subseaPreset = findTopLevelTag(typeDef.subseaTags);
-    if (!landPreset || !subseaPreset) {
-      throw new Error('Preset error run `yarn 2`');
-    }
+  const presets =
+    'tags' in typeDef
+      ? findTopLevelTags(typeDef.tags)
+      : [
+          ...findTopLevelTags(typeDef.onLandTags),
+          ...findTopLevelTags(typeDef.subseaTags),
+        ];
 
+  let osmCategory: OSMTempFile[string];
+  if (presets.length === 0) {
+    throw new Error('Preset error run `yarn 2`');
+  } else if (presets.length === 1) {
+    osmCategory = osm[presets[0]];
+  } else {
     osmCategory = {
-      noRef: [...osm[landPreset].noRef, ...osm[subseaPreset].noRef],
-      withRef: {
-        ...osm[landPreset].withRef,
-        ...osm[subseaPreset].withRef,
-      },
+      noRef: [],
+      withRef: {},
     };
+    for (const preset of presets) {
+      osmCategory.noRef.push(...osm[preset].noRef);
+      Object.assign(osmCategory.withRef, osm[preset].withRef);
+    }
   }
 
   let total = 0;
@@ -82,12 +79,21 @@ function processOneType(
 
     total += 1;
 
-    if (osmCategory.withRef[ref]) {
-      // Case A: there is already a OSM feature with the ref:linz:place_id tag
-      const action = compareFeatures(ref, nzgbPlace, osmCategory.withRef[ref]);
-      if (action) output.features.push(action);
+    let osmPlace = osmCategory.withRef[ref];
+    // we can't immediately find the place, try lookup the other categories
+    if (!osmPlace) {
+      for (const category in osm) {
+        const maybeMatch = osm[category].withRef[ref];
+        if (maybeMatch) {
+          osmPlace = maybeMatch;
+        }
+      }
+    }
 
-      delete osmCategory.withRef[ref]; // so that we can check which refs in OSM aren't in the NZGB dataset
+    if (osmPlace) {
+      // Case A: there is already a OSM feature with the ref:linz:place_id tag
+      const action = compareFeatures(ref, nzgbPlace, osmPlace);
+      if (action) output.features.push(action);
     } else {
       // there is no OSM feature with a ref, so try to search by name
       const matchFound = findMatch(nzgbPlace, osmCategory.noRef);
@@ -109,7 +115,7 @@ function processOneType(
           id: ref,
           geometry: nzgbGeom[+ref.split(';')[0]]?.geom || fallbackGeom,
           properties: {
-            ...getPresetTags(nzgbPlace.lat, nzgbPlace.lng),
+            ...getPresetTags(nzgbPlace).all,
 
             name: nzgbPlace.name,
             'name:mi': nzgbPlace.nameMi,
