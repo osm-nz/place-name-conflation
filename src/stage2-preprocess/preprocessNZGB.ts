@@ -1,6 +1,12 @@
 import { promises as fs, createReadStream } from 'node:fs';
 import csv from 'csv-parser';
-import { EtymologyReport, NZGBCsv, NZGBSourceData, Ref } from '../types';
+import {
+  EtymologyReport,
+  NZGBCsv,
+  NZGBSourceData,
+  Ref,
+  WikidataFile,
+} from '../types';
 import { OVERRIDES, NameType, NZGB_NAME_TYPES, IGNORE } from '../data';
 import { etymologyReportPath, nzgbCsvPath, nzgbJsonPath, toCSV } from '../core';
 import { maybeTeReoName } from './maybeTeReoName';
@@ -45,8 +51,6 @@ async function csvToTemp(): Promise<{ out: TempObject; ety: EtymologyReport }> {
         const nameIdKey = Object.keys(data)[0] as 'name_id';
         const ref = +data[nameIdKey];
 
-        if (IGNORE.has(ref)) return; // ignore this entry
-
         out[data.feat_id] ||= {
           lat: +data.crd_latitude,
           lng: +data.crd_longitude,
@@ -83,7 +87,7 @@ async function csvToTemp(): Promise<{ out: TempObject; ety: EtymologyReport }> {
   });
 }
 
-async function tempToFinal(temp: TempObject) {
+async function tempToFinal(temp: TempObject, wikidataFile: WikidataFile) {
   const out: NZGBSourceData = {};
   for (const featId in temp) {
     const place = temp[featId];
@@ -92,9 +96,14 @@ async function tempToFinal(temp: TempObject) {
       console.warn(`(!) Unexpected type '${place.type}'`);
     }
 
+    // eslint-disable-next-line no-continue
+    if (place.names.some((x) => IGNORE.has(x.ref))) continue;
+
     const officialNames = place.names
       .filter((x) => x.status === 'O')
       .sort((a, b) => +b.teReo - +a.teReo);
+
+    let ref: Ref;
 
     if (officialNames.length) {
       const name = officialNames
@@ -109,7 +118,7 @@ async function tempToFinal(temp: TempObject) {
         .filter((x) => !name.includes(x.name)); // remove oldNames which are just subsets of the official name
 
       // this feature has one or more official names
-      const ref = officialNames
+      ref = officialNames
         .map((n) => n.ref)
         .sort((a, b) => b - a) // sort so that the newest ref comes first
         .join(';') as Ref;
@@ -117,8 +126,6 @@ async function tempToFinal(temp: TempObject) {
       if (officialNames.length > 2) {
         throw new Error('More than 2 official names');
       }
-
-      const mainName = place.names.find((x) => x.ref === +ref.split(';')[0]);
 
       out[ref] = {
         lat: place.lat,
@@ -133,18 +140,25 @@ async function tempToFinal(temp: TempObject) {
 
         ...OVERRIDES[ref],
       };
-      if (mainName?.etymology && mainName.etymology !== 0xbad) {
-        out[ref].etymology = mainName.etymology;
-      }
-      if (place.isArea) out[ref].isArea = true;
-      if (place.isUndersea) out[ref].isUndersea = true;
     } else {
       // this feature has no official names
       const names = place.names
         .filter((x) => x.status === 'U')
         .sort((a, b) => +b.teReo - +a.teReo);
 
-      const ref = names.map((n) => n.ref).join(';') as Ref;
+      if (!names.length) {
+        console.warn(
+          'Broken entry',
+          place.names.map((x) => x.name).join(' / '),
+        );
+        continue; // eslint-disable-line no-continue
+      }
+
+      ref = names
+        .map((n) => n.ref)
+        .sort((a, b) => b - a) // sort so that the newest ref comes first
+        .join(';') as Ref;
+
       const name = names.map((n) => n.name).join(' / ');
 
       const oldNames = place.names
@@ -163,9 +177,23 @@ async function tempToFinal(temp: TempObject) {
 
         ...OVERRIDES[ref],
       };
-      if (place.isArea) out[ref].isArea = true;
     }
+
+    const mainName = place.names.find((x) => x.ref === +ref.split(';')[0]);
+    const qId = ref
+      .split(';')
+      .map((r) => wikidataFile[+r])
+      .find((x) => x); // find the first truthy value
+
+    if (mainName?.etymology && mainName.etymology !== 0xbad) {
+      out[ref].etymology = mainName.etymology;
+    }
+    if (place.isArea) out[ref].isArea = true;
+    if (place.isUndersea) out[ref].isUndersea = true;
+    if (qId) out[ref].qId = qId;
   }
+
+  console.log(`\npart 2 done (${Object.keys(out).length})`);
 
   const stats: Record<string, number> = {};
   for (const ref in out) {
@@ -178,15 +206,13 @@ async function tempToFinal(temp: TempObject) {
     .join('\n');
   console.log(statsString);
 
-  console.log(`\npart 2 done (${Object.keys(out).length})`);
-
   return out;
 }
 
-export async function preprocessNZGB(): Promise<void> {
+export async function preprocessNZGB(wikidataMap: WikidataFile): Promise<void> {
   console.log('Preprocessing NZGB data...');
   const temp = await csvToTemp();
-  const res = await tempToFinal(temp.out);
+  const res = await tempToFinal(temp.out, wikidataMap);
   await fs.writeFile(nzgbJsonPath, JSON.stringify(res, null, 2));
 
   // hack to move the errors to the end

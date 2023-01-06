@@ -2,7 +2,10 @@ import type { Feature, Geometry } from 'geojson';
 import type { Tags } from 'pbf2json';
 import type { NZGBFeature, OSMFeature } from '../../types';
 import { createDiamond, distanceBetween } from '../../core';
-import { nameHasSlashForOldName } from './nameHasSlashForOldName';
+import {
+  nameHasSlashForOldName,
+  isUnofficialAndOsmHasMacrons,
+} from './exceptions';
 import { checkTagsFromFeaturePreset } from './checkTagsFromFeaturePreset';
 
 // in metres
@@ -19,7 +22,12 @@ export function compareFeatures(
   const tagChanges: Tags = { __action: 'edit' };
   // 1. Check `name`
   if (osm.tags.name !== nzgb.name) {
-    if (!nameHasSlashForOldName(nzgb, osm)) {
+    const exceptions = [
+      nameHasSlashForOldName(nzgb, osm),
+      isUnofficialAndOsmHasMacrons(nzgb, osm),
+    ];
+    // if every exception is false, then propse changing the name
+    if (exceptions.every((x) => !x)) {
       tagChanges.name = nzgb.name;
     }
   }
@@ -42,7 +50,10 @@ export function compareFeatures(
     (altName) => !osmAltNames.includes(altName),
   );
   if (altNamesNotInOsm?.length) {
-    tagChanges.alt_name = [nzgb.altNames!, ...osmAltNames].join(';');
+    tagChanges.alt_name = [
+      ...altNamesNotInOsm,
+      ...(osm.tags.alt_name?.split(';') || []),
+    ].join(';');
   }
 
   // 4. Check `old_name`
@@ -56,7 +67,10 @@ export function compareFeatures(
     (oldName) => !osmOldNames.includes(oldName),
   );
   if (oldNamesNotInOsm?.length) {
-    tagChanges.old_name = [nzgb.oldNames!, ...osmOldNames].join(';');
+    tagChanges.old_name = [
+      ...oldNamesNotInOsm,
+      ...(osm.tags.old_name?.split(';') || []),
+    ].join(';');
   }
 
   // 5. Check `ref:linz:place_id`
@@ -85,6 +99,11 @@ export function compareFeatures(
     !osm.tags['name:etymology:wikidata']
   ) {
     tagChanges['name:etymology'] = nzgb.etymology;
+  }
+
+  // 9. Ensure the wikidata tag is correct. If not, either OSM or wikidata needs fixing
+  if (nzgb.qId !== osm.tags.wikidata) {
+    tagChanges.wikidata = nzgb.qId;
   }
 
   //

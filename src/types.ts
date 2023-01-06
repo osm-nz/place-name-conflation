@@ -68,6 +68,7 @@ export type NZGBFeature = {
   isArea?: true;
   isUndersea?: true;
   etymology?: string;
+  qId?: string;
 };
 export type NZGBSourceData = {
   [placeId: string]: NZGBFeature;
@@ -123,4 +124,8 @@ export type EtymologyReport = {
     result: string | undefined | 0xbad,
     originInfo: string,
   ][];
+};
+
+export type WikidataFile = {
+  [nzgbRef: number]: string;
 };

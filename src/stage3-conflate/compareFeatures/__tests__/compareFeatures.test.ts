@@ -73,6 +73,43 @@ describe('compareFeatures', () => {
     ).toBeTruthy();
   });
 
+  it('allows the OSM feature to have macrons if the NZGB has no official name', () => {
+    expect(
+      conflateTags({ name: 'Puhoi', official: undefined }, { name: 'Pūhoi' }),
+    ).toBeUndefined();
+  });
+
+  it('does not apply the above exception for features that have an official name', () => {
+    expect(
+      conflateTags({ name: 'Puhoi', official: true }, { name: 'Pūhoi' }),
+    ).toStrictEqual({ name: 'Puhoi' });
+  });
+
+  it('can append a value to old_name', () => {
+    expect(
+      conflateTags(
+        { name: 'Pākaraka', oldNames: ['Maxwelltown'] },
+        { name: 'Pākaraka', old_name: 'Maxwell' },
+      ),
+    ).toStrictEqual({ old_name: 'Maxwelltown;Maxwell' });
+  });
+
+  it("doesn't try to add old_name if the value already exists in alt_name", () => {
+    expect(
+      conflateTags(
+        { name: 'Pākaraka', oldNames: ['Maxwell'] },
+        { name: 'Pākaraka', alt_name: 'Maxwell' },
+      ),
+    ).toBeUndefined();
+
+    expect(
+      conflateTags(
+        { name: 'Pākaraka', oldNames: ['Maxwell', 'Maxwelltown'] },
+        { name: 'Pākaraka', 'not:name': 'Maxwell' },
+      ),
+    ).toStrictEqual({ old_name: 'Maxwelltown' });
+  });
+
   it("fixes the ref tag if it's wrong", () => {
     expect(
       conflateTags(
