@@ -101,8 +101,16 @@ export function compareFeatures(
     tagChanges['name:etymology'] = nzgb.etymology;
   }
 
-  // 9. Ensure the wikidata tag is correct. If not, either OSM or wikidata needs fixing
-  if (nzgb.qId !== osm.tags.wikidata) {
+  // 9. Ensure that `name:etymology:wikidata` tag is correct. If not, either OSM or wikidata needs fixing
+  if (
+    nzgb.etymologyQId &&
+    nzgb.etymologyQId !== osm.tags['name:etymology:wikidata']
+  ) {
+    tagChanges['name:etymology:wikidata'] = nzgb.etymologyQId;
+  }
+
+  // 10. Ensure the `wikidata` tag is correct. If not, either OSM or wikidata needs fixing
+  if (nzgb.qId && nzgb.qId !== osm.tags.wikidata) {
     tagChanges.wikidata = nzgb.qId;
   }
 

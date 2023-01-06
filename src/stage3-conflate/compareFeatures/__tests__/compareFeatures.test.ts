@@ -146,6 +146,23 @@ describe('compareFeatures', () => {
     ).toBeUndefined();
   });
 
+  it("adds name:etymology:wikidata if it's mising", () => {
+    expect(
+      conflateTags(
+        { name: 'Arundel', etymologyQId: 'Q60429821' },
+        { name: 'Arundel' },
+      ),
+    ).toStrictEqual({ 'name:etymology:wikidata': 'Q60429821' });
+
+    // all good
+    expect(
+      conflateTags(
+        { name: 'Arundel', etymologyQId: 'Q60429821' },
+        { name: 'Arundel', 'name:etymology:wikidata': 'Q60429821' },
+      ),
+    ).toBeUndefined();
+  });
+
   describe('preset tag changes', () => {
     it('can fix the preset tags', () => {
       expect(

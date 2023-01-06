@@ -180,7 +180,7 @@ async function tempToFinal(temp: TempObject, wikidataFile: WikidataFile) {
     }
 
     const mainName = place.names.find((x) => x.ref === +ref.split(';')[0]);
-    const qId = ref
+    const wikidata = ref
       .split(';')
       .map((r) => wikidataFile[+r])
       .find((x) => x); // find the first truthy value
@@ -190,7 +190,14 @@ async function tempToFinal(temp: TempObject, wikidataFile: WikidataFile) {
     }
     if (place.isArea) out[ref].isArea = true;
     if (place.isUndersea) out[ref].isUndersea = true;
-    if (qId) out[ref].qId = qId;
+    if (wikidata) {
+      const [qId, etyQId, ety] = wikidata;
+      out[ref].qId = qId;
+      if (etyQId && ety) {
+        out[ref].etymology = ety; // prefer the value from wikidata over what we deduced
+        out[ref].etymologyQId = etyQId;
+      }
+    }
   }
 
   console.log(`\npart 2 done (${Object.keys(out).length})`);

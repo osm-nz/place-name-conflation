@@ -6,12 +6,22 @@ type WikidataAPI = {
   results: {
     bindings: {
       qid: { type: 'uri'; value: string };
+      etymology?: { type: 'uri'; value: string };
+      etymologyLabel?: { type: 'literal'; value: string };
       ref: { type: 'literal'; value: string };
     }[];
   };
 };
 
-const QUERY = 'SELECT ?qid ?ref WHERE { ?qid wdt:P5104 ?ref. }';
+const QUERY = `
+  SELECT ?qid ?etymology ?etymologyLabel ?ref WHERE {
+    ?qid wdt:P5104 ?ref.
+    OPTIONAL { ?qid wdt:P138 ?etymology }
+    SERVICE wikibase:label {
+      bd:serviceParam wikibase:language "en,mi,fr,es,de"
+    }
+  }
+`;
 
 export async function fetchWikidata(): Promise<WikidataFile> {
   try {
@@ -32,8 +42,11 @@ export async function fetchWikidata(): Promise<WikidataFile> {
     const out: WikidataFile = {};
     for (const item of apiResp.results.bindings) {
       const qid = item.qid.value.split('/entity/')[1];
+      const etymologyQ = item.etymology?.value.split('/entity/')[1];
+      const etymology = item.etymologyLabel?.value;
       const ref = +item.ref.value;
-      out[ref] = qid;
+      out[ref] = [qid];
+      if (etymologyQ && etymology) out[ref].push(etymologyQ, etymology);
     }
     await fs.writeFile(wikidataFile, JSON.stringify(out));
     console.log('Wikidata done.');
