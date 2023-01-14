@@ -8,17 +8,23 @@ type WikidataAPI = {
       qid: { type: 'uri'; value: string };
       etymology?: { type: 'uri'; value: string };
       etymologyLabel?: { type: 'literal'; value: string };
+      wikipedia?: { type: 'uri'; value: string };
       ref: { type: 'literal'; value: string };
     }[];
   };
 };
 
 const QUERY = `
-  SELECT ?qid ?etymology ?etymologyLabel ?ref WHERE {
+  SELECT ?qid ?etymology ?etymologyLabel ?ref ?wikipedia WHERE {
     ?qid wdt:P5104 ?ref.
     OPTIONAL { ?qid wdt:P138 ?etymology }
     SERVICE wikibase:label {
       bd:serviceParam wikibase:language "en,mi,fr,es,de"
+    }
+    OPTIONAL {
+      ?wikipedia schema:about ?qid .
+      ?wikipedia schema:inLanguage "en" .
+      FILTER (SUBSTR(str(?wikipedia), 1, 25) = "https://en.wikipedia.org/")
     }
   }
 `;
@@ -41,12 +47,16 @@ export async function fetchWikidata(): Promise<WikidataFile> {
 
     const out: WikidataFile = {};
     for (const item of apiResp.results.bindings) {
-      const qid = item.qid.value.split('/entity/')[1];
-      const etymologyQ = item.etymology?.value.split('/entity/')[1];
+      const qId = item.qid.value.split('/entity/')[1];
+      const wikipedia = item.wikipedia?.value
+        ? decodeURIComponent(
+            `en:${item.wikipedia.value.split('/wiki/')[1].replace(/_/g, ' ')}`,
+          )
+        : undefined;
+      const etymologyQId = item.etymology?.value.split('/entity/')[1];
       const etymology = item.etymologyLabel?.value;
       const ref = +item.ref.value;
-      out[ref] = [qid];
-      if (etymologyQ && etymology) out[ref].push(etymologyQ, etymology);
+      out[ref] = { qId, etymologyQId, etymology, wikipedia };
     }
     await fs.writeFile(wikidataFile, JSON.stringify(out));
     console.log('Wikidata done.');

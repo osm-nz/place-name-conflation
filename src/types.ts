@@ -70,6 +70,7 @@ export type NZGBFeature = {
   etymology?: string;
   etymologyQId?: string;
   qId?: string;
+  wikipedia?: string;
 };
 export type NZGBSourceData = {
   [placeId: string]: NZGBFeature;
@@ -128,5 +129,10 @@ export type EtymologyReport = {
 };
 
 export type WikidataFile = {
-  [nzgbRef: number]: [qId: string, etymologyQId?: string, etymology?: string];
+  [nzgbRef: number]: {
+    qId: string;
+    etymologyQId?: string;
+    etymology?: string;
+    wikipedia?: string;
+  };
 };

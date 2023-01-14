@@ -195,6 +195,33 @@ describe('compareFeatures', () => {
     ).toBeUndefined();
   });
 
+  it("adds the wikipedia tag if it's missing", () => {
+    expect(
+      conflateTags(
+        { name: 'Kuratau', wikipedia: 'en:Kuratau' },
+        { name: 'typo' },
+      ),
+    ).toStrictEqual({ name: 'Kuratau', wikipedia: 'en:Kuratau' });
+  });
+
+  it("doesn't add the wikipedia tag if it's the only tag to be changed", () => {
+    expect(
+      conflateTags(
+        { name: 'Kuratau', wikipedia: 'en:Kuratau' },
+        { name: 'Kuratau' },
+      ),
+    ).toBeUndefined();
+  });
+
+  it("doesn't override the wikipedia tag if it already exists", () => {
+    expect(
+      conflateTags(
+        { name: 'Kuratau', wikipedia: 'en:Kuratau' },
+        { name: 'Kuratau', wikipedia: 'de:Kuratau (Neuseeland)' },
+      ),
+    ).toBeUndefined();
+  });
+
   it('removes source:name if it duplicates the ref tag', () => {
     expect(
       conflateTags(

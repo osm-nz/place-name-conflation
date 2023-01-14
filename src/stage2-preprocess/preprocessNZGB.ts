@@ -198,11 +198,14 @@ async function tempToFinal(temp: TempObject, wikidataFile: WikidataFile) {
     if (place.isArea) out[ref].isArea = true;
     if (place.isUndersea) out[ref].isUndersea = true;
     if (wikidata) {
-      const [qId, etyQId, ety] = wikidata;
+      const { qId, etymology: ety, etymologyQId: etyQId, wikipedia } = wikidata;
       out[ref].qId = qId;
       if (etyQId && ety) {
         out[ref].etymology = ety; // prefer the value from wikidata over what we deduced
         out[ref].etymologyQId = etyQId;
+      }
+      if (wikipedia) {
+        out[ref].wikipedia = wikipedia;
       }
     }
 

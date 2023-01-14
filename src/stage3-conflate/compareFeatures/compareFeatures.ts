@@ -149,6 +149,11 @@ export function compareFeatures(
     tagChanges.wikidata = nzgb.qId;
   }
 
+  // 11. Add the wikipedia tag if it's missing
+  if (nzgb.wikipedia && !osm.tags.wikipedia) {
+    tagChanges.wikipedia = nzgb.wikipedia;
+  }
+
   // 12. Replace source:name=https://gazetteer.linz.govt.nz/place/XXX with ref:linz:place_id=XXX
   if (
     osm.tags['source:name']?.startsWith(
@@ -182,6 +187,11 @@ export function compareFeatures(
   // If the only thing the system wants to do is add `name:mi`, then abort.
   // It's probably wrong and will be dealt with separately
   if (numChanges === 1 && tagChanges['name:mi']) return undefined;
+  // Likewise for the wikipedia tag: if it's the only thing we want to edit, don't bother.
+  if (numChanges === 1 && tagChanges.wikipedia) return undefined;
+  if (numChanges === 2 && tagChanges.wikipedia && tagChanges['name:mi']) {
+    return undefined;
+  }
 
   return {
     type: 'Feature',
