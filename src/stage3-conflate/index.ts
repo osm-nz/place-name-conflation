@@ -17,7 +17,10 @@ import {
   osmPathFilePath,
   tempOsmFile,
 } from '../core';
-import { compareFeatures } from './compareFeatures';
+import {
+  compareFeatures,
+  wikidataErrors,
+} from './compareFeatures/compareFeatures';
 import { findMatch } from './findMatch';
 import { getPresetTags } from './getPresetTags';
 
@@ -53,12 +56,18 @@ function processOneType(
     throw new Error('Preset error run `yarn 2`');
   } else if (presets.length === 1) {
     osmCategory = osm[presets[0]];
+    if (!osmCategory) {
+      throw new Error('Preset error run `yarn 2`');
+    }
   } else {
     osmCategory = {
       noRef: [],
       withRef: {},
     };
     for (const preset of presets) {
+      if (!osm[preset]) {
+        throw new Error('Preset error run `yarn 2`');
+      }
       osmCategory.noRef.push(...osm[preset].noRef);
       Object.assign(osmCategory.withRef, osm[preset].withRef);
     }
@@ -71,6 +80,8 @@ function processOneType(
     size: 'large',
     stats: { okayCount: 0, addNodeCount: 0, addWayCount: 0, editCount: 0 },
     features: [],
+    instructions:
+      'Please review and refine suggestions to add `name:mi` or `name:etymology`. These suggestions may not be perfect.',
   };
 
   for (const ref in nzgb) {
@@ -122,6 +133,11 @@ function processOneType(
             alt_name: nzgbPlace.altNames?.join(';'),
             old_name: nzgbPlace.oldNames?.join(';'),
             'ref:linz:place_id': ref,
+
+            wikidata: nzgbPlace.qId,
+            wikipedia: nzgbPlace.wikipedia,
+            'name:etymology': nzgbPlace.etymology,
+            'name:etymology:wikidata': nzgbPlace.etymologyQId,
           },
         });
       }
@@ -182,6 +198,9 @@ async function main() {
       statsObj[type] = osmPatch.stats;
     }
   }
+
+  console.log(wikidataErrors.join('\n'));
+
   await fs.writeFile(nzgbIndexPath, JSON.stringify(statsObj, null, 2));
   await fs.writeFile(extraLayersFile, JSON.stringify(extraLayersObj));
 }

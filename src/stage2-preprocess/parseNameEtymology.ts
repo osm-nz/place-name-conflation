@@ -14,10 +14,11 @@ const NONSENSE = [
 ];
 // maintaining a list of overrides here is probably a crap idea. Better to manually enter the
 // right data into OSM and then the system can ignore that entry.
-const OVERRIDES: Record<number, string> = {
+const OVERRIDES: Record<number, string | undefined> = {
   14837: 'RV Tangaroa',
   14838: 'RV Tangaroa',
   31103: 'Johann Wolfgang von Goethe',
+  44138: undefined,
 };
 
 const TITLES = new Set(

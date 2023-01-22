@@ -14,7 +14,7 @@ export const osmPathFilePath = (type: NameType) =>
 
 export const nzgbCsvPath = join(repoRoot, 'tmp/nzgb.csv');
 export const nzgbCsvAreasPath = join(repoRoot, 'tmp/nzgb-areas.csv');
-export const nzgbCsvLinesPath = join(repoRoot, 'tmp/nzgb-areas.csv');
+export const nzgbCsvLinesPath = join(repoRoot, 'tmp/nzgb-lines.csv');
 export const nzgbJsonPath = join(repoRoot, 'tmp/nzgb.json');
 export const nzgbJsonGeometryPath = join(repoRoot, 'tmp/nzgb-geom.json');
 export const etymologyReportPath = join(repoRoot, 'tmp/etymology.csv');

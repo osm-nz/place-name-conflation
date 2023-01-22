@@ -30,12 +30,16 @@ const _NZGB_NAME_TYPES = {
   },
   Bay: { tags: { natural: 'bay' } },
   Beach: { tags: { natural: 'beach' } },
-  Bend: { tags: { natural: 'peak' } }, // MNAT: McMurdo - american Nunatak
+  Bend: {
+    tags: { waterway: 'bend' },
+    acceptTags: [{ water: 'bend' }],
+    addTags: { place: 'locality' },
+  },
   Bridge: { tags: { man_made: 'bridge' } },
   Building: __SKIP, // only 100 features, all already in OSM, and querying for building=yes is a waste of resources
   Bush: { tags: { natural: 'wood' } }, // this is ambigous, in NZ English this could mean forest or shrubland
-  Caldera: { tags: { natural: 'volcano' } },
-  Canal: { tags: { natural: 'water', water: 'canal' } },
+  Caldera: { tags: { natural: 'caldera' } },
+  Canal: { tags: { type: 'waterway', waterway: 'canal' } },
   Canyon: {
     tags: {
       'seamark:type': 'sea_area',
@@ -47,11 +51,21 @@ const _NZGB_NAME_TYPES = {
   Channel: { tags: { natural: 'strait' } },
   Chasm: { tags: { place: 'locality' } },
   City: { tags: { place: '*' }, addTags: { place: 'city' } },
-  Clearing: { tags: { place: 'locality' } },
+  Clearing: {
+    tags: { place: 'locality' },
+    acceptTags: [{ landcover: 'clearing' }],
+  },
   Cliff: { tags: { natural: 'cliff' } },
   'Coast Feature': { tags: { place: 'locality' } },
-  'Conservation Park': { tags: { place: 'locality' } },
-  Crater: { tags: { natural: 'volcano' } },
+  'Conservation Park': __SKIP, // reconsider after future DOC import
+  Crater: {
+    tags: { natural: 'crater' },
+    acceptTags: [
+      { natural: 'volcano' },
+      { natural: 'peak' },
+      { geological: 'volcanic_caldera_rim' },
+    ] as Tags[],
+  },
   Crevasse: { tags: { natural: 'crevasse' } },
   Deep: {
     tags: {
@@ -60,15 +74,22 @@ const _NZGB_NAME_TYPES = {
     },
   },
   Desert: { tags: { desert: 'yes' } },
-  'Ecological Area': { tags: { place: 'locality' } },
+  'Ecological Area': __SKIP, // reconsider after future DOC import
   Escarpment: {
     tags: {
       'seamark:type': 'sea_area',
       'seamark:sea_area:category': 'escarpment',
     },
   },
-  Estuary: { tags: { natural: 'bay' }, addTags: { estuary: 'yes' } },
-  Facility: { tags: { place: 'locality' } },
+  Estuary: {
+    tags: { natural: 'bay' },
+    addTags: { estuary: 'yes' },
+    acceptTags: [{ natural: 'water', water: 'lagoon' }],
+  },
+  Facility: {
+    // this category is for dams, hydroelectric power schemes, and other random features
+    tags: { place: 'locality' },
+  },
   Fan: {
     tags: {
       'seamark:type': 'sea_area',
@@ -92,7 +113,7 @@ const _NZGB_NAME_TYPES = {
     },
   },
   Glacier: { tags: { natural: 'glacier' } },
-  'Government Purpose Reserve': __SKIP, // these should be imported as boundaries first
+  'Government Purpose Reserve': __SKIP, // reconsider after future DOC import
   Guyot: {
     tags: {
       'seamark:type': 'sea_area',
@@ -104,7 +125,10 @@ const _NZGB_NAME_TYPES = {
     tags: { historic: '*' },
     addTags: { historic: 'yes' },
   },
-  'Historic Reserve': { tags: { historic: '*' }, addTags: { historic: 'yes' } },
+  'Historic Reserve': {
+    tags: { leisure: 'nature_reserve' },
+    acceptTags: [{ leisure: 'park' }, { historic: '*' }] as Tags[],
+  },
   'Historic Site': { tags: { historic: '*' }, addTags: { historic: 'yes' } },
   Hole: {
     tags: {
@@ -114,7 +138,7 @@ const _NZGB_NAME_TYPES = {
   },
   'Ice Feature': { tags: { place: 'locality' } },
   Island: { tags: { place: 'island' } },
-  Isthmus: { tags: { place: 'locality' } },
+  Isthmus: { tags: { place: 'locality' }, addTags: { natural: 'isthmus' } },
   Knoll: {
     tags: {
       'seamark:type': 'sea_area',
@@ -122,7 +146,7 @@ const _NZGB_NAME_TYPES = {
     },
   },
   Lake: { tags: { natural: 'water' }, addTags: { water: 'lake' } },
-  Ledge: { tags: { natural: 'ledge' } },
+  Ledge: { tags: { natural: 'ledge' }, acceptTags: [{ natural: 'cliff' }] },
   'Local Authority': __SKIP,
   Locality: { tags: { place: 'locality' } }, // locality (settlement)
   'Marine Feature': {
@@ -131,7 +155,7 @@ const _NZGB_NAME_TYPES = {
       'seamark:sea_area:category': 'yes',
     },
   },
-  'Marine Reserve': __SKIP, // { tags: { boundary: 'protected_area' } }, // needs to be imported first
+  'Marine Reserve': __SKIP, // reconsider after future DOC import
   Mound: {
     tags: {
       'seamark:type': 'sea_area',
@@ -139,8 +163,8 @@ const _NZGB_NAME_TYPES = {
     },
   },
   'Mud Volcano': { tags: { natural: 'volcano' } },
-  'National Park': __SKIP, // { tags: { boundary: 'protected_area' } }, // needs to be imported first
-  'Nature Reserve': __SKIP, // { tags: { leisure: 'nature_reserve' } }, // needs to be imported first
+  'National Park': __SKIP, // reconsider after future DOC import
+  'Nature Reserve': __SKIP, // reconsider after future DOC import
   Pass: { tags: { natural: 'saddle' } }, // mountain pass / saddle
   Peak: {
     tags: {
@@ -148,7 +172,10 @@ const _NZGB_NAME_TYPES = {
       'seamark:sea_area:category': 'peak',
     },
   },
-  Peninsula: { tags: { natural: 'cape' } },
+  Peninsula: {
+    tags: { natural: 'peninsula' },
+    acceptTags: [{ natural: 'cape' }],
+  },
   Pinnacle: {
     tags: {
       'seamark:type': 'sea_area',
@@ -170,14 +197,25 @@ const _NZGB_NAME_TYPES = {
     },
   },
   Point: { tags: { natural: 'cape' } }, // point, headland, cape
-  Pool: { tags: { natural: 'water' } },
+  Pool: { tags: { natural: 'water' }, addTags: { water: 'stream_pool' } },
   Port: { tags: { natural: 'bay' } }, // these are not `industrial=port`
   'Railway Crossing': { tags: { place: 'locality' } }, // only 2 features both are localities
   'Railway Junction': { tags: { railway: 'yard' } },
-  'Railway Line': { tags: { type: 'route', route: 'railway' } },
-  'Railway Station': { tags: { railway: 'station' } },
+  'Railway Line': {
+    tags: { type: 'route', route: 'railway' },
+    acceptTags: [{ type: 'route', route: 'train' }], // exception for vintage railways
+    chillMode: true,
+  },
+  'Railway Station': {
+    tags: { railway: 'station' },
+    acceptTags: [{ railway: 'halt' }],
+  },
   Range: { tags: { natural: 'ridge' } },
-  Rapid: { tags: { natural: 'water', water: 'rapids' } },
+  Rapid: {
+    tags: { natural: 'water', water: 'rapids' },
+    acceptTags: [{ waterway: 'waterfall' }],
+  },
+
   Recreation: { tags: { place: 'locality' } }, // named places within ski fields
   'Recreation Reserve': { tags: { leisure: 'park' } },
   Reef: { tags: { natural: 'reef' } },
@@ -205,15 +243,15 @@ const _NZGB_NAME_TYPES = {
       'seamark:sea_area:category': 'saddle',
     },
   },
-  'Sanctuary Area': { tags: { place: 'locality' } },
+  'Sanctuary Area': __SKIP, // reconsider after future DOC import
   Scarp: {
     tags: {
       'seamark:type': 'sea_area',
       'seamark:sea_area:category': 'escarpment',
     },
   },
-  'Scenic Reserve': __SKIP, // { tags: { leisure: 'park' } }, // skip for now, it's big and should be imported as areas
-  'Scientific Reserve': { tags: { leisure: 'park' } },
+  'Scenic Reserve': __SKIP, // reconsider after future DOC import
+  'Scientific Reserve': __SKIP, // reconsider after future DOC import
   Sea: { tags: { place: 'sea' } },
   'Sea Valley': {
     tags: {
@@ -252,7 +290,13 @@ const _NZGB_NAME_TYPES = {
       'seamark:sea_area:category': 'shelf-edge',
     },
   },
-  Shoal: { tags: { natural: 'shoal' } },
+  Shoal: {
+    tags: {
+      'seamark:type': 'sea_area',
+      'seamark:sea_area:category': 'shoal',
+      natural: 'shoal',
+    },
+  },
   Sill: {
     tags: {
       'seamark:type': 'sea_area',
@@ -267,7 +311,10 @@ const _NZGB_NAME_TYPES = {
     },
   },
   Spit: { tags: { natural: 'cape' } },
-  Spring: { tags: { natural: 'spring' } },
+  Spring: {
+    tags: { natural: 'spring' },
+    acceptTags: [{ natural: 'hot_spring' }],
+  },
   Spur: {
     tags: {
       'seamark:type': 'sea_area',
@@ -307,10 +354,13 @@ const _NZGB_NAME_TYPES = {
   },
   Village: { tags: { place: '*' }, addTags: { place: 'village' } },
   Volcano: { tags: { natural: 'volcano' } },
-  Waterfall: { tags: { waterway: 'waterfall' } }, // or lava-waterfall
+  Waterfall: {
+    tags: { waterway: 'waterfall' },
+    acceptTags: [{ water: 'rapids' }],
+  }, // or lava-waterfall
   Wetland: { tags: { natural: 'wetland' } },
-  'Wilderness Area': __SKIP, // these should be imported as boundaries first
-  'Wildlife Management Area': __SKIP, // these should be imported as boundaries first
+  'Wilderness Area': __SKIP, // reconsider after future DOC import
+  'Wildlife Management Area': __SKIP, // reconsider after future DOC import
 } satisfies TypeMap;
 
 export const DONT_IMPORT_AS_AREA = new Set<NameType>([
@@ -319,6 +369,13 @@ export const DONT_IMPORT_AS_AREA = new Set<NameType>([
   'Suburb',
   'Town',
   'City',
+  'Railway Line',
+]);
+export const DONT_TRY_TO_MOVE = new Set<NameType>([
+  'Stream',
+  'Canal',
+  'Railway Line',
+  'Sea',
 ]);
 
 // this what we query the OSM planet file for, since it's cheaper to do one overly generous
@@ -329,12 +386,14 @@ export const TOP_LEVEL_TAGS = [
   'place',
   'historic',
   'waterway~waterfall',
+  'waterway~bend',
   'leisure~park',
   'man_made~bridge',
   'man_made~survey_point',
   'railway~yard',
   'railway~station',
   'route~railway',
+  'type~waterway',
   'seamark:sea_area:category',
   'desert~yes',
   'ford~yes',
@@ -350,16 +409,24 @@ type Tags = { [key: string]: string };
 type TypeMap = Record<
   string,
   | typeof __SKIP
-  | {
-      /** the primary tag(s) for the feature, used when searching the planet  */
-      tags: Tags;
-      /** other tags to add, but not to include in the query  */
-      addTags?: Tags;
-    }
-  | {
-      /** tags to use when the feature is on land */
-      onLandTags: Tags;
-      /** tags to use when the feature is underwater offshore */
-      subseaTags: Tags;
-    }
+  | ({
+      /** alternative tagging methods to accept */
+      acceptTags?: Tags[];
+
+      /** if true, we allow the `name` tag to have any value, and we maintain the `official_name` tag instead */
+      chillMode?: boolean;
+    } & (
+      | {
+          /** the primary tag(s) for the feature, used when searching the planet  */
+          tags: Tags;
+          /** other tags to add, but not to include in the query  */
+          addTags?: Tags;
+        }
+      | {
+          /** tags to use when the feature is on land */
+          onLandTags: Tags;
+          /** tags to use when the feature is underwater offshore */
+          subseaTags: Tags;
+        }
+    ))
 >;

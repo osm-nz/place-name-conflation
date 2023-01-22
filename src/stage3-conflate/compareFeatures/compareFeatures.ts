@@ -1,3 +1,4 @@
+import assert from 'node:assert';
 import type { Feature, Geometry } from 'geojson';
 import type { Tags } from 'pbf2json';
 import type { NZGBFeature, OSMFeature } from '../../types';
@@ -5,13 +6,17 @@ import { createDiamond, distanceBetween } from '../../core';
 import {
   nameHasSlashForOldName,
   isUnofficialAndOsmHasMacrons,
+  allowSlashInsteadOfOr,
 } from './exceptions';
 import { checkTagsFromFeaturePreset } from './checkTagsFromFeaturePreset';
+import { DONT_TRY_TO_MOVE, NZGB_NAME_TYPES, __SKIP } from '../../data';
 
 // in metres
 const DISTANCE_APART_THRESHOLD_NODE = 2_500;
 // this one is slightly higher since the centroid of the area might be quite far from the NZGB point
 const DISTANCE_APART_THRESHOLD_AREA = 15_000;
+
+export const wikidataErrors: string[] = [];
 
 /** compares the OSM place with the NZGB place and returns a list of issues */
 export function compareFeatures(
@@ -20,11 +25,16 @@ export function compareFeatures(
   osm: OSMFeature,
 ): Feature<Geometry, Tags> | undefined {
   const tagChanges: Tags = { __action: 'edit' };
-  // 1. Check `name`
-  if (osm.tags.name !== nzgb.name) {
+
+  const preset = NZGB_NAME_TYPES[nzgb.type];
+  assert(preset !== __SKIP);
+
+  // 1a. Check `name`
+  if (!preset.chillMode && osm.tags.name !== nzgb.name) {
     const exceptions = [
       nameHasSlashForOldName(nzgb, osm),
       isUnofficialAndOsmHasMacrons(nzgb, osm),
+      allowSlashInsteadOfOr(nzgb, osm),
     ];
     // if every exception is false, then propse changing the name
     if (exceptions.every((x) => !x)) {
@@ -32,8 +42,23 @@ export function compareFeatures(
     }
   }
 
+  // 1b. In chill mode, we only care if `official_name` is correct.
+  if (
+    preset.chillMode &&
+    osm.tags.official_name !== nzgb.name &&
+    osm.tags.name !== nzgb.name // no need for `official_name` if `name` is the official one
+  ) {
+    tagChanges.official_name = nzgb.name;
+  }
+
   // 2. Check `name:mi`
-  if (nzgb.nameMi && !osm.tags['name:mi']) {
+  //    special case: If we're adding macrons to `name`, override `name:mi` as well
+  const nameChangeIsAddingMacrons =
+    tagChanges.name &&
+    tagChanges.name.normalize('NFD').replace(/\p{Diacritic}/gu, '') ===
+      osm.tags.name;
+
+  if (nzgb.nameMi && (!osm.tags['name:mi'] || nameChangeIsAddingMacrons)) {
     tagChanges['name:mi'] = nzgb.nameMi;
   }
 
@@ -84,7 +109,7 @@ export function compareFeatures(
     osm.osmId[0] === 'n'
       ? DISTANCE_APART_THRESHOLD_NODE
       : DISTANCE_APART_THRESHOLD_AREA;
-  if (metresAway > threshold) {
+  if (metresAway > threshold && !DONT_TRY_TO_MOVE.has(nzgb.type)) {
     tagChanges.__action = 'move';
   }
 
@@ -111,7 +136,40 @@ export function compareFeatures(
 
   // 10. Ensure the `wikidata` tag is correct. If not, either OSM or wikidata needs fixing
   if (nzgb.qId && nzgb.qId !== osm.tags.wikidata) {
+    if (osm.tags.wikidata) {
+      // abort and don't touch the feature if there appears to be duplicate entries in wikidata
+      // Fixing this data issue may require editing or merging wikidata items.
+      wikidataErrors.push(
+        `(!) Wikidata tag is wrong on ${osm.osmId} (${osm.tags.wikidata}), should be ${nzgb.qId}`,
+      );
+      return undefined;
+    }
+
+    // wikidata tag is mising
     tagChanges.wikidata = nzgb.qId;
+  }
+
+  // 12. Replace source:name=https://gazetteer.linz.govt.nz/place/XXX with ref:linz:place_id=XXX
+  if (
+    osm.tags['source:name']?.startsWith(
+      'https://gazetteer.linz.govt.nz/place/',
+    ) &&
+    !osm.tags['source:name'].includes(';')
+  ) {
+    const existingRef = osm.tags['source:name'].replace(
+      'https://gazetteer.linz.govt.nz/place/',
+      '',
+    );
+    if (existingRef !== ref) {
+      // abort and don't touch the feature if someone has already tagged it with a different ref
+      // in the source:name tag
+      wikidataErrors.push(
+        `(!) Incorrect source:name tag on ${osm.osmId}, should be “${ref}”`,
+      );
+      return undefined;
+    }
+    // delete the source:name tag since it duplicates ref:linz:place_id
+    tagChanges['source:name'] = '🗑️';
   }
 
   //

@@ -49,9 +49,9 @@ async function readCsv(path: string): Promise<GeometryTmpFile> {
         }
 
         /** cause of the BOM character at the start of the csv file we do this */
-        const WKT = data[Object.keys(data)[0] as 'WKT'];
+        const WKT = data.WKT || data['\ufeffWKT' as 'WKT'];
 
-        const geom = wktToGeoJson(WKT);
+        let geom = wktToGeoJson(WKT);
         if (!geom) {
           console.log(`\tBroken geometry for ${ref} (${data.name})`);
           return;
@@ -68,6 +68,11 @@ async function readCsv(path: string): Promise<GeometryTmpFile> {
           geom.coordinates = geom.coordinates.map((line) =>
             simplify(line, WAY_SIMPLIFICATION),
           );
+          // Try to simplify MultiLineString down to a LineString if it only
+          // has one member.
+          if (geom.coordinates.length === 1) {
+            geom = { type: 'LineString', coordinates: geom.coordinates[0] };
+          }
         } else if (geom.type === 'MultiPolygon') {
           // Coord[][][]
           geom.coordinates = geom.coordinates.map((member) =>

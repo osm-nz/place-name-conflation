@@ -32,7 +32,15 @@ export function isUnofficialAndOsmHasMacrons(
   if (nzgb.official) return false;
 
   return (
-    nzgb.name.normalize('NFD').replace(/\p{Diacritic}/gu, '') ===
-    osm.tags.name?.normalize('NFD').replace(/\p{Diacritic}/gu, '')
+    nzgb.name === osm.tags.name?.normalize('NFD').replace(/\p{Diacritic}/gu, '')
   );
+}
+
+/**
+ * If the name is 'Blackwood Bay or Tahuahua Bay', allow the OSM value to have
+ * a `/` instead of `or`. Regardless, we will suggest the official value when
+ * creating the feature.
+ */
+export function allowSlashInsteadOfOr(nzgb: NZGBFeature, osm: OSMFeature) {
+  return nzgb.name.replace(/ or /g, ' / ') === osm.tags.name;
 }

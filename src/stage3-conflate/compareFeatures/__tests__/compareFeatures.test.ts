@@ -1,6 +1,6 @@
 import type { Tags } from 'pbf2json';
 import type { NZGBFeature } from '../../../types';
-import { compareFeatures } from '..';
+import { compareFeatures } from '../compareFeatures';
 
 // helper function so we can write more concise tests.
 // if it returns undefined it means there's nothing to fix
@@ -37,6 +37,24 @@ describe('compareFeatures', () => {
         { name: 'Bayview', 'not:name': 'Bayvue', 'alt_name:en': 'Bay View' },
       ),
     ).toBeUndefined();
+  });
+
+  it("doesn't override name:mi if it's already set", () => {
+    expect(
+      conflateTags(
+        { name: 'Ōtāhuhu Creek', nameMi: 'Ōtāhuhu' },
+        { name: 'Ōtāhuhu Creek', 'name:mi': 'some other value' },
+      ),
+    ).toBeUndefined();
+  });
+
+  it('does override name:mi if `name` is being changed', () => {
+    expect(
+      conflateTags(
+        { name: 'Ōtāhuhu Creek', nameMi: 'Ōtāhuhu' },
+        { name: 'Otahuhu Creek', 'name:mi': 'Otahuhu' },
+      ),
+    ).toStrictEqual({ name: 'Ōtāhuhu Creek', 'name:mi': 'Ōtāhuhu' });
   });
 
   it("won't suggest editing a feature if the only change is to add name:mi", () => {
@@ -83,6 +101,20 @@ describe('compareFeatures', () => {
     expect(
       conflateTags({ name: 'Puhoi', official: true }, { name: 'Pūhoi' }),
     ).toStrictEqual({ name: 'Puhoi' });
+  });
+
+  it('allows OSM to use a slash instead of the word "or"', () => {
+    expect(
+      conflateTags(
+        { name: 'Blackwood Bay or Tahuahua Bay' },
+        { name: 'Blackwood Bay / Tahuahua Bay' },
+      ),
+    ).toBeUndefined();
+
+    // but when creating a new feature, it uses the official spelling by default.
+    expect(
+      conflateTags({ name: 'Blackwood Bay or Tahuahua Bay' }, {}),
+    ).toStrictEqual({ name: 'Blackwood Bay or Tahuahua Bay' });
   });
 
   it('can append a value to old_name', () => {
@@ -163,6 +195,66 @@ describe('compareFeatures', () => {
     ).toBeUndefined();
   });
 
+  it('removes source:name if it duplicates the ref tag', () => {
+    expect(
+      conflateTags(
+        { name: 'Kororāreka' },
+        {
+          name: 'Kororāreka',
+          'source:name': 'https://gazetteer.linz.govt.nz/place/26242',
+        },
+      ),
+    ).toStrictEqual({ 'source:name': '🗑️' });
+  });
+
+  it('does not remove source:name if it contains multiple values', () => {
+    expect(
+      conflateTags(
+        { name: 'Kororāreka' },
+        {
+          name: 'Kororāreka',
+          'source:name':
+            'https://gazetteer.linz.govt.nz/place/26242;survey;Bing',
+        },
+      ),
+    ).toBeUndefined();
+  });
+
+  it('allows any name in chill mode but ensures official_name is correct', () => {
+    // 1. nothing to change, official_name is all good
+    expect(
+      conflateTags(
+        { name: 'Otiria-Okaihau Industrial Railway', type: 'Railway Line' },
+        {
+          type: 'route',
+          route: 'railway',
+          name: 'Ōkaihau Branch',
+          official_name: 'Otiria-Okaihau Industrial Railway',
+        },
+      ),
+    ).toBeUndefined();
+
+    // 2. official_name missing so it tries to add it
+    expect(
+      conflateTags(
+        { name: 'Otiria-Okaihau Industrial Railway', type: 'Railway Line' },
+        { type: 'route', route: 'railway', name: 'Ōkaihau Branch' },
+      ),
+    ).toStrictEqual({ official_name: 'Otiria-Okaihau Industrial Railway' });
+
+    // 3. official_name missing but name=official_name so there's no point adding it
+    expect(
+      conflateTags(
+        { name: 'Otiria-Okaihau Industrial Railway', type: 'Railway Line' },
+        {
+          type: 'route',
+          route: 'railway',
+          name: 'Otiria-Okaihau Industrial Railway',
+        },
+      ),
+    ).toBeUndefined();
+  });
+
   describe('preset tag changes', () => {
     it('can fix the preset tags', () => {
       expect(
@@ -202,6 +294,24 @@ describe('compareFeatures', () => {
           },
         ),
       ).toBeUndefined();
+    });
+
+    it('uses acceptTags to accept alternative tagging methods', () => {
+      // 1. We accept `natural=hot_spring` as an alternative
+      expect(
+        conflateTags(
+          { name: 'Winter Spring', type: 'Spring' },
+          { name: 'Winter Spring', natural: 'hot_spring' },
+        ),
+      ).toBeUndefined();
+
+      // 2. but we don't accept `natural=wssdfsdfw` as an alternative
+      expect(
+        conflateTags(
+          { name: 'Winter Spring', type: 'Spring' },
+          { name: 'Winter Spring', natural: 'wssdfsdfw' },
+        ),
+      ).toStrictEqual({ natural: 'spring' }); // default preset is suggested
     });
   });
 });

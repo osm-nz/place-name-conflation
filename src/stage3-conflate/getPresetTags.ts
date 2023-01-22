@@ -3,7 +3,11 @@ import type { Tags } from 'pbf2json';
 import type { NZGBFeature } from '../types';
 import { NZGB_NAME_TYPES, __SKIP } from '../data';
 
-export function getPresetTags(place: NZGBFeature): { all: Tags; match: Tags } {
+export function getPresetTags(place: NZGBFeature): {
+  all: Tags;
+  match: Tags;
+  acceptTags?: Tags[];
+} {
   const preset = NZGB_NAME_TYPES[place.type];
   assert(preset !== __SKIP); // impossible
 
@@ -11,10 +15,20 @@ export function getPresetTags(place: NZGBFeature): { all: Tags; match: Tags } {
     return {
       all: { ...preset.tags, ...preset.addTags },
       match: preset.tags,
+      acceptTags: preset.acceptTags,
     };
   }
 
-  return place.isUndersea
-    ? { all: preset.subseaTags, match: preset.subseaTags }
-    : { all: preset.onLandTags, match: preset.onLandTags };
+  if (place.isUndersea) {
+    return {
+      all: preset.subseaTags,
+      match: preset.subseaTags,
+      acceptTags: preset.acceptTags,
+    };
+  }
+  return {
+    all: preset.onLandTags,
+    match: preset.onLandTags,
+    acceptTags: preset.acceptTags,
+  };
 }

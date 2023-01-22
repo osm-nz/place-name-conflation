@@ -32,6 +32,18 @@ type TempObject = {
   };
 };
 
+// these transformations must be kept to a bare minimum
+const transformName = (_nzgbName: string, type: NameType) => {
+  let nzgbName = _nzgbName.replace(/ Pa$/i, ' Pā');
+
+  // for train stations, OSM doesn't include the suffix in the name
+  if (type === 'Railway Station') {
+    nzgbName = nzgbName.replace(/( Railway)? Station$/, '');
+  }
+
+  return nzgbName;
+};
+
 async function csvToTemp(): Promise<{ out: TempObject; ety: EtymologyReport }> {
   return new Promise((resolve, reject) => {
     const out: TempObject = {};
@@ -48,8 +60,7 @@ async function csvToTemp(): Promise<{ out: TempObject; ety: EtymologyReport }> {
         i += 1;
 
         /** cause of the BOM character at the start of the csv file we do this */
-        const nameIdKey = Object.keys(data)[0] as 'name_id';
-        const ref = +data[nameIdKey];
+        const ref = +(data.name_id || data['\ufeffname_id' as 'name_id']);
 
         out[data.feat_id] ||= {
           lat: +data.crd_latitude,
@@ -67,7 +78,7 @@ async function csvToTemp(): Promise<{ out: TempObject; ety: EtymologyReport }> {
         else ety.stats.failed += 1;
 
         out[data.feat_id].names.push({
-          name: data.name,
+          name: transformName(data.name, data.feat_type),
           ref,
           // eslint-disable-next-line no-nested-ternary
           status: data.status.startsWith('Official')
@@ -137,8 +148,6 @@ async function tempToFinal(temp: TempObject, wikidataFile: WikidataFile) {
 
         altNames: altNames.length ? altNames.map((n) => n.name) : undefined,
         oldNames: oldNames.length ? oldNames.map((n) => n.name) : undefined,
-
-        ...OVERRIDES[ref],
       };
     } else {
       // this feature has no official names
@@ -174,8 +183,6 @@ async function tempToFinal(temp: TempObject, wikidataFile: WikidataFile) {
         name,
         nameMi: maybeTeReoName(unofficialTeReoNames),
         oldNames: oldNames.length ? oldNames.map((n) => n.name) : undefined,
-
-        ...OVERRIDES[ref],
       };
     }
 
@@ -198,6 +205,8 @@ async function tempToFinal(temp: TempObject, wikidataFile: WikidataFile) {
         out[ref].etymologyQId = etyQId;
       }
     }
+
+    Object.assign(out[ref], OVERRIDES[ref]);
   }
 
   console.log(`\npart 2 done (${Object.keys(out).length})`);

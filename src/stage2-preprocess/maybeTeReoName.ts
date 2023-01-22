@@ -41,8 +41,8 @@ function removeEnglishPrefixesAndSuffixes(name: string): string | undefined {
   const newName = name
     .replace(englishPrefixesRegExp, '')
     .replace(englishSuffixesRegExp, '')
-    .replace(/ Pa$/i, ' Pā')
-    .replace(/Maori/i, 'Māori')
+    .replace(/ Pa$/, ' Pā')
+    .replace(/\bMaori\b/, 'Māori')
     .trim();
 
   if (newName !== name) {

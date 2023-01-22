@@ -38,6 +38,10 @@
       "object_types": ["node", "way", "area", "relation"]
     },
     {
+      "key": "official_name",
+      "object_types": ["node", "way", "area", "relation"]
+    },
+    {
       "key": "not:name",
       "object_types": ["node", "way", "area", "relation"]
     },
