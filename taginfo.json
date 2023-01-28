@@ -65,6 +65,18 @@
     {
       "key": "seamark:sea_area:category",
       "object_types": ["node", "way", "area", "relation"]
+    },
+    {
+      "key": "type",
+      "value": "multilinestring",
+      "object_types": ["relation"],
+      "description": "Used for features around New Zealand that cross the antimeridian"
+    },
+    {
+      "key": "closure_segment",
+      "value": "yes",
+      "object_types": ["way"],
+      "description": "Used for features around New Zealand that cross the antimeridian"
     }
   ]
 }

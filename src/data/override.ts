@@ -7,10 +7,14 @@ export const OVERRIDES: Record<Ref, Partial<NZGBSourceData[string]>> = {
   59543: { name: 'Simla Crescent' }, // misspelling in NZGB dataset
   5727: { name: 'Takaanini', oldNames: ['Takanini'] },
   3194: { name: 'Manukau' }, // remove " City Centre" suffix
-  24112: { qId: 'Q82632727' }, // `valley` and `suburb` wikidata items are messed up
+  24112: { qId: 'Q6347824' }, // `valley` and `suburb` wikidata items are messed up
   54886: { name: 'Waitomokia', altNames: ['Mount Gabriel'] },
   4903: { name: 'Queenstown Airport' },
   4115: { name: 'Ōhaaki Power Station' },
+
+  5532: { name: 'Saint Johns' }, // avoid changing to St. Johns
+  31781: { name: 'Mount Tasman / Rarakiroa' },
+  59478: { name: 'Mount Atkinson' },
 };
 
 export const IGNORE = new Set([
@@ -19,6 +23,8 @@ export const IGNORE = new Set([
   59622, // Mt Eden station
   59553, // Redwood station mapped as two separate stations
 
+  10233, // (former) Te Urewera National Park
+
   54478, // Westland Land District - insane multipolygon
   54480, // Otago Land District - insane multipolygon
 
@@ -26,8 +32,10 @@ export const IGNORE = new Set([
   3193, // City = Manukau City
   55806, // Former City = Manukau City
 
+  39273, // Duplicate Saint Johns suburb
+  20153, // duplicate
+  1995, // duplcaites aoraki/mt cook
   4071, // Duplicate of Northland Region
-
   6381, // Duplicate of Queen Charlotte Sound / Tōtaranui
   17197, // Duplicate of Braemar Springs
 

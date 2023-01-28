@@ -1,0 +1,12 @@
+SELECT ?qid ?etymology ?etymologyLabel ?ref ?wikipedia WHERE {
+  ?qid wdt:P5104 ?ref.
+  OPTIONAL { ?qid wdt:P138 ?etymology }
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,mi,fr,es,de"
+  }
+  OPTIONAL {
+    ?wikipedia schema:about ?qid .
+    ?wikipedia schema:inLanguage "en" .
+    FILTER (SUBSTR(str(?wikipedia), 1, 25) = "https://en.wikipedia.org/")
+  }
+}

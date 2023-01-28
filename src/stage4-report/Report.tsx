@@ -5,13 +5,25 @@ import { OsmPatchFile, StatsFile } from '../types';
 
 const { format: formatNumber } = new Intl.NumberFormat('en-NZ');
 
-const total = (stats: OsmPatchFile['stats']) =>
+type Stats = OsmPatchFile['stats'];
+
+const ZERO: Stats = {
+  addNodeCount: 0,
+  addWayCount: 0,
+  editCount: 0,
+  okayCount: 0,
+};
+
+const total = (stats: Stats) =>
   stats.addNodeCount + stats.addWayCount + stats.editCount + stats.okayCount;
 
-const ProgressBar: React.FC<{ stats: OsmPatchFile['stats'] }> = ({ stats }) => {
-  const okay = Math.floor((stats.okayCount / total(stats)) * 100);
-  const edit = Math.floor((stats.editCount / total(stats)) * 100);
-  const add = 100 - okay - edit;
+const ProgressBar: React.FC<{ stats: Stats }> = ({ stats }) => {
+  const okay = +((stats.okayCount / total(stats)) * 100).toFixed(3);
+  const edit = +((stats.editCount / total(stats)) * 100).toFixed(3);
+  const add = +(
+    ((stats.addNodeCount + stats.addWayCount) / total(stats)) *
+    100
+  ).toFixed(3);
 
   return (
     <div className="progress-bar">
@@ -20,7 +32,7 @@ const ProgressBar: React.FC<{ stats: OsmPatchFile['stats'] }> = ({ stats }) => {
       <div style={{ width: `${add}%` }}>
         {/* eslint-disable-next-line no-nested-ternary */}
         {add === 0 ? (
-          0
+          ''
         ) : stats.addWayCount === 0 ? (
           formatNumber(stats.addNodeCount)
         ) : (
@@ -79,6 +91,32 @@ export const Report: React.FC<{ data: StatsFile; css: string }> = ({
   const sorted = Object.entries(data).sort(
     ([, a], [, b]) => (b ? total(b) : 0) - (a ? total(a) : 0),
   );
+
+  // generate summary of totals
+  const allStats = { ...ZERO };
+  for (const item of Object.values(data)) {
+    if (item) {
+      for (const _key in item) {
+        const key = _key as keyof Stats;
+        allStats[key] += item[key];
+      }
+    }
+  }
+
+  // generate summary of layers
+  const layerCount = { ...ZERO };
+  for (const _layerName in data) {
+    const layerName = _layerName as keyof typeof data;
+    const stats = data[layerName];
+    if (!stats) {
+      // layerCount.addNodeCount += 1; // skipped
+    } else if (!stats.addNodeCount && !stats.addWayCount && !stats.editCount) {
+      layerCount.okayCount += 1; // incomplete
+    } else {
+      layerCount.editCount += 1; // complete
+    }
+  }
+
   return (
     <html lang="en-NZ">
       <head>
@@ -87,6 +125,10 @@ export const Report: React.FC<{ data: StatsFile; css: string }> = ({
         <style dangerouslySetInnerHTML={{ __html: css }} />
       </head>
       <body>
+        <div className="summary">
+          Total: <ProgressBar stats={allStats} />
+          Layers: <ProgressBar stats={layerCount} />
+        </div>
         <table>
           <thead>
             <tr>

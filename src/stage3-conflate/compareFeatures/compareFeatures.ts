@@ -36,7 +36,7 @@ export function compareFeatures(
       isUnofficialAndOsmHasMacrons(nzgb, osm),
       allowSlashInsteadOfOr(nzgb, osm),
     ];
-    // if every exception is false, then propse changing the name
+    // if every exception is false, then propose changing the name
     if (exceptions.every((x) => !x)) {
       tagChanges.name = nzgb.name;
     }
@@ -121,7 +121,11 @@ export function compareFeatures(
   if (
     nzgb.etymology &&
     !osm.tags['name:etymology'] &&
-    !osm.tags['name:etymology:wikidata']
+    !osm.tags['name:mi:etymology'] &&
+    !osm.tags['name:en:etymology'] &&
+    !osm.tags['name:etymology:wikidata'] &&
+    !osm.tags['name:mi:etymology:wikidata'] &&
+    !osm.tags['name:en:etymology:wikidata']
   ) {
     tagChanges['name:etymology'] = nzgb.etymology;
   }
@@ -129,7 +133,9 @@ export function compareFeatures(
   // 9. Ensure that `name:etymology:wikidata` tag is correct. If not, either OSM or wikidata needs fixing
   if (
     nzgb.etymologyQId &&
-    nzgb.etymologyQId !== osm.tags['name:etymology:wikidata']
+    nzgb.etymologyQId !== osm.tags['name:etymology:wikidata'] &&
+    nzgb.etymologyQId !== osm.tags['name:mi:etymology:wikidata'] &&
+    nzgb.etymologyQId !== osm.tags['name:en:etymology:wikidata']
   ) {
     tagChanges['name:etymology:wikidata'] = nzgb.etymologyQId;
   }

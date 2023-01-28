@@ -171,6 +171,36 @@ function processOneType(
   return output;
 }
 
+const trivialKeys = new Set([
+  '__action',
+  'ref:linz:place_id',
+  'wikidata',
+  'wikipedia',
+  'name:etymology', // only if there is also name:ety:wikidata
+  'name:etymology:wikidata',
+  'source:name',
+  'alt_name',
+  'old_name',
+]);
+
+// temp - eventually move everything out of ZZ
+const publish: Partial<Record<NameType, true>> = {
+  Hill: true,
+  Locality: true,
+  Bay: true,
+  Point: true,
+  Island: true,
+  Lake: true,
+  Ridge: true,
+  Range: true,
+  Site: true,
+  Rock: true,
+  Cliff: true,
+  Flat: true,
+  Place: true,
+  Beach: true,
+};
+
 async function main() {
   const nzgb: NZGBSourceData = JSON.parse(
     await fs.readFile(nzgbJsonPath, 'utf8'),
@@ -182,6 +212,19 @@ async function main() {
 
   const statsObj: Partial<StatsFile> = {};
   const extraLayersObj: Record<string, OsmPatchFile> = {};
+
+  // Create a special layer with only the trivial changes, so we can race thru the
+  // trivial changes in the import tool. This only affects the extra-layers.geo.json file.
+  const trivialLayerName = 'ZZ Add Wikidata/Ref';
+  extraLayersObj[trivialLayerName] = {
+    type: 'FeatureCollection',
+    stats: { addNodeCount: 0, addWayCount: 0, editCount: 0, okayCount: 0 },
+    size: 'large',
+    instructions:
+      'For this layer, a table editor is much more efficient than RapiD',
+    features: [],
+  };
+
   for (const _type in NZGB_NAME_TYPES) {
     const type = _type as NameType;
     const obj = NZGB_NAME_TYPES[type];
@@ -193,9 +236,21 @@ async function main() {
         osmPathFilePath(type),
         JSON.stringify(osmPatch, null, 2),
       );
-      const layerName = `ZZ Place Names - ${type}`;
-      extraLayersObj[layerName] = osmPatch;
       statsObj[type] = osmPatch.stats;
+
+      for (const f of osmPatch.features) {
+        // if the only thing being editted is the ref tag or wikidata or wikipedia tag
+        const isTrivial =
+          f.properties.__action === 'edit' &&
+          Object.keys(f.properties).every((key) => trivialKeys.has(key)) &&
+          // either both name:ety & wikidata, or niether
+          !!f.properties['name:etymology'] ===
+            !!f.properties['name:etymology:wikidata'];
+
+        if (isTrivial) extraLayersObj[trivialLayerName].features.push(f);
+      }
+
+      extraLayersObj[`${publish[type] ? 'Z' : 'ZZ'} ${type}`] = osmPatch;
     }
   }
 

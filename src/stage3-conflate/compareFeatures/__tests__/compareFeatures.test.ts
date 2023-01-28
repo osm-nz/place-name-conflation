@@ -169,6 +169,27 @@ describe('compareFeatures', () => {
     ).toBeUndefined();
   });
 
+  it("doesn't set name:etymology if name:{lang}:etymology is already set", () => {
+    expect(
+      conflateTags(
+        { name: 'Arundel', etymology: 'Arendelle' },
+        { name: 'Arundel', 'name:mi:etymology': 'some existing value' },
+      ),
+    ).toBeUndefined();
+  });
+
+  it("doesn't set name:etymology if name:{lang}:etymology:wikidata is already set", () => {
+    expect(
+      conflateTags(
+        { name: 'Arundel', etymology: 'Arendelle' },
+        {
+          name: 'Arundel',
+          'name:mi:etymology:wikidata': 'some existing value',
+        },
+      ),
+    ).toBeUndefined();
+  });
+
   it("doesn't add name:ety if name:ety:wikidata already in OSM", () => {
     expect(
       conflateTags(
@@ -185,12 +206,22 @@ describe('compareFeatures', () => {
         { name: 'Arundel' },
       ),
     ).toStrictEqual({ 'name:etymology:wikidata': 'Q60429821' });
+  });
 
-    // all good
+  it("doesn't add name:etymology:wikidata if the tag is already correct", () => {
     expect(
       conflateTags(
         { name: 'Arundel', etymologyQId: 'Q60429821' },
         { name: 'Arundel', 'name:etymology:wikidata': 'Q60429821' },
+      ),
+    ).toBeUndefined();
+  });
+
+  it("doesn't add name:etymology:wikidata if the feature has name:{lang}:etymology:wikidata", () => {
+    expect(
+      conflateTags(
+        { name: 'Arundel', etymologyQId: 'Q60429821' },
+        { name: 'Arundel', 'name:en:etymology:wikidata': 'Q60429821' },
       ),
     ).toBeUndefined();
   });

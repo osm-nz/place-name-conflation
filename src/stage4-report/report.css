@@ -22,6 +22,10 @@ tbody tr:nth-child(odd) {
   background-color: #f2f2f2;
 }
 
+.summary {
+  max-width: 400px;
+}
+
 /* progress bar */
 .progress-bar {
   display: flex;

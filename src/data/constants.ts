@@ -28,7 +28,7 @@ const _NZGB_NAME_TYPES = {
       'seamark:sea_area:category': 'basin',
     },
   },
-  Bay: { tags: { natural: 'bay' } },
+  Bay: { tags: { natural: 'bay' }, acceptTags: [{ natural: 'strait' }] },
   Beach: { tags: { natural: 'beach' } },
   Bend: {
     tags: { waterway: 'bend' },
@@ -55,7 +55,14 @@ const _NZGB_NAME_TYPES = {
     tags: { place: 'locality' },
     acceptTags: [{ landcover: 'clearing' }],
   },
-  Cliff: { tags: { natural: 'cliff' } },
+  Cliff: {
+    tags: { natural: 'cliff' },
+    acceptTags: [
+      { natural: 'cape' },
+      { natural: 'bare_rock' },
+      { natural: 'peak' },
+    ],
+  },
   'Coast Feature': { tags: { place: 'locality' } },
   'Conservation Park': __SKIP, // reconsider after future DOC import
   Crater: {
@@ -120,7 +127,14 @@ const _NZGB_NAME_TYPES = {
       'seamark:sea_area:category': 'guyot',
     },
   },
-  Hill: { tags: { natural: 'peak' } },
+  Hill: {
+    onLandTags: { natural: 'peak' },
+    subseaTags: {
+      'seamark:type': 'sea_area',
+      'seamark:sea_area:category': 'peak',
+    },
+    acceptTags: [{ natural: 'ridge' }, { natural: 'volcano' }],
+  },
   'Historic Antarctic': {
     tags: { historic: '*' },
     addTags: { historic: 'yes' },
@@ -155,7 +169,10 @@ const _NZGB_NAME_TYPES = {
       'seamark:sea_area:category': 'yes',
     },
   },
-  'Marine Reserve': __SKIP, // reconsider after future DOC import
+  'Marine Reserve': {
+    tags: { leisure: 'nature_reserve' },
+    acceptTags: [{ boundary: 'protected_area' }],
+  },
   Mound: {
     tags: {
       'seamark:type': 'sea_area',
@@ -163,7 +180,10 @@ const _NZGB_NAME_TYPES = {
     },
   },
   'Mud Volcano': { tags: { natural: 'volcano' } },
-  'National Park': __SKIP, // reconsider after future DOC import
+  'National Park': {
+    tags: { boundary: 'protected_area', protect_class: '2' },
+    acceptTags: [{ boundary: 'national_park' }],
+  },
   'Nature Reserve': __SKIP, // reconsider after future DOC import
   Pass: { tags: { natural: 'saddle' } }, // mountain pass / saddle
   Peak: {
@@ -218,7 +238,10 @@ const _NZGB_NAME_TYPES = {
 
   Recreation: { tags: { place: 'locality' } }, // named places within ski fields
   'Recreation Reserve': { tags: { leisure: 'park' } },
-  Reef: { tags: { natural: 'reef' } },
+  Reef: {
+    tags: { natural: 'reef' },
+    acceptTags: [{ natural: 'rock' }, { natural: 'bare_rock' }],
+  },
   'Reserve (non-CPA)': { tags: { leisure: 'park' } },
   Ridge: {
     onLandTags: { natural: 'ridge' },
@@ -235,7 +258,11 @@ const _NZGB_NAME_TYPES = {
   },
   Road: __SKIP,
   Roadstead: { tags: { natural: 'bay' } },
-  Rock: { tags: { natural: 'rock' } }, // rock or Nunatak
+  Rock: {
+    // rock or Nunatak
+    tags: { natural: 'rock' },
+    acceptTags: [{ natural: 'bare_rock' }, { natural: 'peak' }],
+  },
   Saddle: {
     // these are all underwater features
     tags: {
@@ -337,7 +364,10 @@ const _NZGB_NAME_TYPES = {
       'seamark:sea_area:category': 'trench',
     },
   },
-  'Trig Station': { tags: { man_made: 'survey_point' } },
+  'Trig Station': {
+    tags: { man_made: 'survey_point' },
+    chillMode: true, // prefer the names from LINZ's geodetic dataset
+  },
   Trough: {
     tags: {
       'seamark:type': 'sea_area',
@@ -370,12 +400,14 @@ export const DONT_IMPORT_AS_AREA = new Set<NameType>([
   'Town',
   'City',
   'Railway Line',
+  'National Park',
 ]);
 export const DONT_TRY_TO_MOVE = new Set<NameType>([
   'Stream',
   'Canal',
   'Railway Line',
   'Sea',
+  'National Park',
 ]);
 
 // this what we query the OSM planet file for, since it's cheaper to do one overly generous
@@ -388,6 +420,8 @@ export const TOP_LEVEL_TAGS = [
   'waterway~waterfall',
   'waterway~bend',
   'leisure~park',
+  'leisure~nature_reserve',
+  'boundary~protected_area',
   'man_made~bridge',
   'man_made~survey_point',
   'railway~yard',
