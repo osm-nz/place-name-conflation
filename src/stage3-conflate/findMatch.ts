@@ -10,7 +10,8 @@ const stripDownName = (name: string) =>
     .toLowerCase()
     .normalize('NFD')
     .replace(/\p{Diacritic}/gu, '')
-    .replace(/[^\w ]/g, '');
+    .replace(/[^\w ]/g, '')
+    .replace(/^Mt /g, 'Mount ');
 
 const rankTags = (el: OSMFeature, nzgb: NZGBFeature) => {
   const presetTags = getPresetTags(nzgb);

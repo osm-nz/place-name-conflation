@@ -80,7 +80,11 @@ const _NZGB_NAME_TYPES = {
       'seamark:sea_area:category': 'deep',
     },
   },
-  Desert: { tags: { desert: 'yes' } },
+  Desert: {
+    // someone has been bulk deleting desert=* from around the world,
+    // so we can't use that tag anymore...
+    tags: { natural: 'sand' },
+  },
   'Ecological Area': __SKIP, // reconsider after future DOC import
   Escarpment: {
     tags: {
@@ -133,7 +137,13 @@ const _NZGB_NAME_TYPES = {
       'seamark:type': 'sea_area',
       'seamark:sea_area:category': 'peak',
     },
-    acceptTags: [{ natural: 'ridge' }, { natural: 'volcano' }],
+    acceptTags: [
+      { natural: 'hill' },
+      { natural: 'ridge' },
+      { natural: 'cliff' },
+      { natural: 'saddle' },
+      { natural: 'volcano' },
+    ],
   },
   'Historic Antarctic': {
     tags: { historic: '*' },
@@ -206,7 +216,7 @@ const _NZGB_NAME_TYPES = {
   Plain: {
     tags: {
       'seamark:type': 'sea_area',
-      'seamark:sea_area:category': 'plain',
+      'seamark:sea_area:category': 'terrace',
     },
   },
   Plateau: {
@@ -240,7 +250,11 @@ const _NZGB_NAME_TYPES = {
   'Recreation Reserve': { tags: { leisure: 'park' } },
   Reef: {
     tags: { natural: 'reef' },
-    acceptTags: [{ natural: 'rock' }, { natural: 'bare_rock' }],
+    acceptTags: [
+      { natural: 'rock' },
+      { natural: 'bare_rock' },
+      { natural: 'shoal' },
+    ],
   },
   'Reserve (non-CPA)': { tags: { leisure: 'park' } },
   Ridge: {
@@ -323,6 +337,27 @@ const _NZGB_NAME_TYPES = {
       'seamark:sea_area:category': 'shoal',
       natural: 'shoal',
     },
+    acceptTags: [
+      {
+        'seamark:type': 'water_turbulence',
+        'seamark:sea_area:category': 'shoal',
+      },
+      {
+        'seamark:type': 'rock',
+        'seamark:sea_area:category': 'shoal',
+        natural: 'rock',
+      },
+      {
+        'seamark:type': 'obstruction',
+        'seamark:sea_area:category': 'shoal',
+        natural: 'shoal',
+      },
+      {
+        'seamark:type': 'sea_area',
+        'seamark:sea_area:category': 'shoal',
+        natural: 'reef',
+      },
+    ] as Tags[],
   },
   Sill: {
     tags: {
@@ -429,10 +464,8 @@ export const TOP_LEVEL_TAGS = [
   'route~railway',
   'type~waterway',
   'seamark:sea_area:category',
-  'desert~yes',
   'ford~yes',
   'junction~yes',
-  'historic~yes',
 ];
 
 export const NZGB_NAME_TYPES: TypeMap = _NZGB_NAME_TYPES;

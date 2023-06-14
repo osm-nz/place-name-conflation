@@ -179,6 +179,7 @@ const trivialKeys = new Set([
   'name:etymology', // only if there is also name:ety:wikidata
   'name:etymology:wikidata',
   'source:name',
+  'source',
   'alt_name',
   'old_name',
 ]);
@@ -247,7 +248,10 @@ async function main() {
           !!f.properties['name:etymology'] ===
             !!f.properties['name:etymology:wikidata'];
 
-        if (isTrivial) extraLayersObj[trivialLayerName].features.push(f);
+        if (isTrivial) {
+          extraLayersObj[trivialLayerName].features.push(f);
+          extraLayersObj[trivialLayerName].stats.editCount++;
+        }
       }
 
       extraLayersObj[`${publish[type] ? 'Z' : 'ZZ'} ${type}`] = osmPatch;

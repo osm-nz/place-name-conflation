@@ -32,12 +32,17 @@ export const IGNORE = new Set([
   3193, // City = Manukau City
   55806, // Former City = Manukau City
 
+  21058, // Freemans Bay is no longer a bay
+  47772, // Westhaven...
+
   39273, // Duplicate Saint Johns suburb
   20153, // duplicate
   1995, // duplcaites aoraki/mt cook
   4071, // Duplicate of Northland Region
   6381, // Duplicate of Queen Charlotte Sound / Tōtaranui
   17197, // Duplicate of Braemar Springs
+
+  14798, // Snares Depression - "does not exist"
 
   // these areas are bigger than australia...
   40632, // Southwest Pacific Basin
@@ -47,4 +52,6 @@ export const IGNORE = new Set([
 
   // outside of the bbox for oceania + antarctica
   56588, // Southern Ocean
+  49092, // Polheim (am Südpol)
+  48987, // Butcher's Shop :(bottom of the world)
 ]);

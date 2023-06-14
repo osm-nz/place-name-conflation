@@ -32,7 +32,8 @@ export function isUnofficialAndOsmHasMacrons(
   if (nzgb.official) return false;
 
   return (
-    nzgb.name === osm.tags.name?.normalize('NFD').replace(/\p{Diacritic}/gu, '')
+    nzgb.name?.normalize('NFD').replaceAll(/\p{Diacritic}/gu, '') ===
+    osm.tags.name?.normalize('NFD').replaceAll(/\p{Diacritic}/gu, '')
   );
 }
 
@@ -42,5 +43,5 @@ export function isUnofficialAndOsmHasMacrons(
  * creating the feature.
  */
 export function allowSlashInsteadOfOr(nzgb: NZGBFeature, osm: OSMFeature) {
-  return nzgb.name.replace(/ or /g, ' / ') === osm.tags.name;
+  return nzgb.name.replaceAll(' or ', ' / ') === osm.tags.name;
 }
