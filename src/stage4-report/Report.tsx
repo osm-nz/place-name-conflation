@@ -54,9 +54,9 @@ const RenderKV: React.FC<{
   return (
     <>
       {renderBraces && multiple && '('}
-      {Object.entries(tags).map(([k, v], i) => (
+      {Object.entries(tags).map(([k, v], index) => (
         <Fragment key={k}>
-          {!!i && ' + '}
+          {!!index && ' + '}
           <code>
             <a href={`https://wiki.osm.org/Key:${k}`}>{k}</a>=
             <a href={`https://wiki.osm.org/Tag:${k}=${v}`}>{v}</a>
@@ -69,17 +69,17 @@ const RenderKV: React.FC<{
 };
 
 const Tags: React.FC<{ type: NameType }> = ({ type }) => {
-  const obj = NZGB_NAME_TYPES[type];
-  if (typeof obj === 'symbol') return null;
+  const object = NZGB_NAME_TYPES[type];
+  if (typeof object === 'symbol') return null;
 
-  if ('tags' in obj) {
-    return <RenderKV tags={{ ...obj.tags, ...obj.addTags }} />;
+  if ('tags' in object) {
+    return <RenderKV tags={{ ...object.tags, ...object.addTags }} />;
   }
 
   return (
     <>
-      <RenderKV tags={obj.onLandTags} renderBraces />
-      or <RenderKV tags={obj.subseaTags} renderBraces />
+      <RenderKV tags={object.onLandTags} renderBraces />
+      or <RenderKV tags={object.subseaTags} renderBraces />
     </>
   );
 };
@@ -108,12 +108,19 @@ export const Report: React.FC<{ data: StatsFile; css: string }> = ({
   for (const _layerName in data) {
     const layerName = _layerName as keyof typeof data;
     const stats = data[layerName];
-    if (!stats) {
-      // layerCount.addNodeCount += 1; // skipped
-    } else if (!stats.addNodeCount && !stats.addWayCount && !stats.editCount) {
-      layerCount.okayCount += 1; // incomplete
+
+    if (stats) {
+      const remaining =
+        stats.addNodeCount + stats.addWayCount + stats.editCount;
+      if (remaining === 0) {
+        layerCount.okayCount += 1; // complete
+      } else if (remaining / stats.okayCount > 0.9) {
+        layerCount.editCount += 1; // >90% complete
+      } else {
+        layerCount.addNodeCount += 1; // incomplete
+      }
     } else {
-      layerCount.editCount += 1; // complete
+      // layerCount.addNodeCount += 1; // skipped
     }
   }
 

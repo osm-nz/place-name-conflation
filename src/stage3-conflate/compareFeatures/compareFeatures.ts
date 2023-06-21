@@ -55,7 +55,7 @@ export function compareFeatures(
   //    special case: If we're adding macrons to `name`, override `name:mi` as well
   const nameChangeIsAddingMacrons =
     tagChanges.name &&
-    tagChanges.name.normalize('NFD').replace(/\p{Diacritic}/gu, '') ===
+    tagChanges.name.normalize('NFD').replaceAll(/\p{Diacritic}/gu, '') ===
       osm.tags.name;
 
   if (nzgb.nameMi && (!osm.tags['name:mi'] || nameChangeIsAddingMacrons)) {
@@ -187,15 +187,15 @@ export function compareFeatures(
   // END OF CHECKS
   //
 
-  const numChanges = Object.keys(tagChanges).length - 1;
-  if (numChanges === 0) return undefined;
+  const numberChanges = Object.keys(tagChanges).length - 1;
+  if (numberChanges === 0) return undefined;
 
   // If the only thing the system wants to do is add `name:mi`, then abort.
   // It's probably wrong and will be dealt with separately
-  if (numChanges === 1 && tagChanges['name:mi']) return undefined;
+  if (numberChanges === 1 && tagChanges['name:mi']) return undefined;
   // Likewise for the wikipedia tag: if it's the only thing we want to edit, don't bother.
-  if (numChanges === 1 && tagChanges.wikipedia) return undefined;
-  if (numChanges === 2 && tagChanges.wikipedia && tagChanges['name:mi']) {
+  if (numberChanges === 1 && tagChanges.wikipedia) return undefined;
+  if (numberChanges === 2 && tagChanges.wikipedia && tagChanges['name:mi']) {
     return undefined;
   }
 

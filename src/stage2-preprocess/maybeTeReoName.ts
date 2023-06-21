@@ -33,6 +33,7 @@ const bannedWordsRegExp = new RegExp(
 );
 
 // te reo only has 15 letters, not 26, so this a simple first check
+// eslint-disable-next-line unicorn/better-regex -- it's more clear written out like this
 const anyNonTeReoLetters = /[^-ghkmnprtw aeiouāēīōū]/i;
 
 function removeEnglishPrefixesAndSuffixes(name: string): string | undefined {
@@ -63,9 +64,9 @@ function removeEnglishPrefixesAndSuffixes(name: string): string | undefined {
 /** the higher the rank, the more likely we think it could be te reo māori */
 function rankName(name: string | undefined) {
   if (!name) return -2; // definitely not
-  if (name.match(anyNonTeReoLetters)) return -1; // very unlikely
+  if (anyNonTeReoLetters.test(name)) return -1; // very unlikely
 
-  if (name.match(/[āēīōū]/i)) return 1; // very likely
+  if (/[āēīōū]/i.test(name)) return 1; // very likely
 
   // TODO: we could do a lot more intelligent guesswork here
 
