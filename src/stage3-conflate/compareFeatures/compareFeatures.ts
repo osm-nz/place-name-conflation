@@ -12,7 +12,7 @@ import { checkTagsFromFeaturePreset } from './checkTagsFromFeaturePreset';
 import { DONT_TRY_TO_MOVE, NZGB_NAME_TYPES, __SKIP } from '../../data';
 
 // in metres
-const DISTANCE_APART_THRESHOLD_NODE = 2_500;
+const DISTANCE_APART_THRESHOLD_NODE = 2500;
 // this one is slightly higher since the centroid of the area might be quite far from the NZGB point
 const DISTANCE_APART_THRESHOLD_AREA = 15_000;
 

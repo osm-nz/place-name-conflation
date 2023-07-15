@@ -30,11 +30,11 @@ export async function fetchWikidata(): Promise<WikidataFile> {
       'utf8',
     );
 
-    const req = await fetch(
+    const request = await fetch(
       `https://query.wikidata.org/sparql?query=${encodeURIComponent(QUERY)}`,
       { headers: { Accept: 'application/sparql-results+json' } },
     );
-    const apiResp: WikidataAPI = await req.json();
+    const apiResp: WikidataAPI = await request.json();
 
     const out: WikidataFile = {};
     const duplicateItems: Record<number, true> = {};
@@ -44,7 +44,9 @@ export async function fetchWikidata(): Promise<WikidataFile> {
       const qId = item.qid.value.split('/entity/')[1];
       const wikipedia = item.wikipedia?.value
         ? decodeURIComponent(
-            `en:${item.wikipedia.value.split('/wiki/')[1].replace(/_/g, ' ')}`,
+            `en:${item.wikipedia.value
+              .split('/wiki/')[1]
+              .replaceAll('_', ' ')}`,
           )
         : undefined;
       const etymologyQId = item.etymology?.value.split('/entity/')[1];

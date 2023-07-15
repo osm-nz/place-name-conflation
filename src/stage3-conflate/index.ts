@@ -1,7 +1,7 @@
 import { promises as fs } from 'node:fs';
 import { Geometry } from 'geojson';
 import {
-  GeometryTmpFile,
+  GeometryTempFile,
   NZGBSourceData,
   OsmPatchFile,
   OSMTempFile,
@@ -28,7 +28,7 @@ import { getPresetTags } from './getPresetTags';
 function processOneType(
   type: NameType,
   nzgb: NZGBSourceData,
-  nzgbGeom: GeometryTmpFile,
+  nzgbGeom: GeometryTempFile,
   osm: OSMTempFile,
 ) {
   console.log(type);
@@ -36,19 +36,19 @@ function processOneType(
 
   console.log('\tConflating...');
 
-  const typeDef = NZGB_NAME_TYPES[type];
-  if (typeDef === __SKIP) {
+  const categoryDefinition = NZGB_NAME_TYPES[type];
+  if (categoryDefinition === __SKIP) {
     throw new Error(`Type "${type}" is skipped`);
   }
 
   // find the top level tag(s) to use. If there is a different tagging scheme
   // for on land vs subsea, then we merge two categories together
   const presets =
-    'tags' in typeDef
-      ? findTopLevelTags(typeDef.tags)
+    'tags' in categoryDefinition
+      ? findTopLevelTags(categoryDefinition.tags)
       : [
-          ...findTopLevelTags(typeDef.onLandTags),
-          ...findTopLevelTags(typeDef.subseaTags),
+          ...findTopLevelTags(categoryDefinition.onLandTags),
+          ...findTopLevelTags(categoryDefinition.subseaTags),
         ];
 
   let osmCategory: OSMTempFile[string];
@@ -206,18 +206,18 @@ async function main() {
   const nzgb: NZGBSourceData = JSON.parse(
     await fs.readFile(nzgbJsonPath, 'utf8'),
   );
-  const nzgbGeom: GeometryTmpFile = JSON.parse(
+  const nzgbGeom: GeometryTempFile = JSON.parse(
     await fs.readFile(nzgbJsonGeometryPath, 'utf8'),
   );
   const osm: OSMTempFile = JSON.parse(await fs.readFile(tempOsmFile, 'utf8'));
 
-  const statsObj: Partial<StatsFile> = {};
-  const extraLayersObj: Record<string, OsmPatchFile> = {};
+  const statsObject: Partial<StatsFile> = {};
+  const extraLayersObject: Record<string, OsmPatchFile> = {};
 
   // Create a special layer with only the trivial changes, so we can race thru the
   // trivial changes in the import tool. This only affects the extra-layers.geo.json file.
   const trivialLayerName = 'ZZ Add Wikidata/Ref';
-  extraLayersObj[trivialLayerName] = {
+  extraLayersObject[trivialLayerName] = {
     type: 'FeatureCollection',
     stats: { addNodeCount: 0, addWayCount: 0, editCount: 0, okayCount: 0 },
     size: 'large',
@@ -228,16 +228,16 @@ async function main() {
 
   for (const _type in NZGB_NAME_TYPES) {
     const type = _type as NameType;
-    const obj = NZGB_NAME_TYPES[type];
-    if (obj === __SKIP) {
-      statsObj[type] = null;
+    const object = NZGB_NAME_TYPES[type];
+    if (object === __SKIP) {
+      statsObject[type] = null;
     } else {
       const osmPatch = processOneType(type, nzgb, nzgbGeom, osm);
       await fs.writeFile(
         osmPathFilePath(type),
         JSON.stringify(osmPatch, null, 2),
       );
-      statsObj[type] = osmPatch.stats;
+      statsObject[type] = osmPatch.stats;
 
       for (const f of osmPatch.features) {
         // if the only thing being editted is the ref tag or wikidata or wikipedia tag
@@ -249,18 +249,18 @@ async function main() {
             !!f.properties['name:etymology:wikidata'];
 
         if (isTrivial) {
-          extraLayersObj[trivialLayerName].features.push(f);
-          extraLayersObj[trivialLayerName].stats.editCount++;
+          extraLayersObject[trivialLayerName].features.push(f);
+          extraLayersObject[trivialLayerName].stats.editCount++;
         }
       }
 
-      extraLayersObj[`${publish[type] ? 'Z' : 'ZZ'} ${type}`] = osmPatch;
+      extraLayersObject[`${publish[type] ? 'Z' : 'ZZ'} ${type}`] = osmPatch;
     }
   }
 
   console.log(wikidataErrors.join('\n'));
 
-  await fs.writeFile(nzgbIndexPath, JSON.stringify(statsObj, null, 2));
-  await fs.writeFile(extraLayersFile, JSON.stringify(extraLayersObj));
+  await fs.writeFile(nzgbIndexPath, JSON.stringify(statsObject, null, 2));
+  await fs.writeFile(extraLayersFile, JSON.stringify(extraLayersObject));
 }
 main();

@@ -1,5 +1,5 @@
 import csv from 'csv-parser';
-import { createReadStream, promises as fs } from 'fs';
+import { createReadStream, promises as fs } from 'node:fs';
 import { parse as wktToGeoJson } from 'wellknown';
 import {
   nzgbCsvAreasPath,
@@ -14,7 +14,7 @@ import {
   NZGB_NAME_TYPES,
   __SKIP,
 } from '../data';
-import { GeometryTmpFile } from '../types';
+import { GeometryTempFile } from '../types';
 
 /** tolerance for https://mourner.github.io/simplify-js */
 const WAY_SIMPLIFICATION = 0.00003;
@@ -26,16 +26,16 @@ type GeometryIn = {
   feat_type: NameType;
 };
 
-async function readCsv(path: string): Promise<GeometryTmpFile> {
+async function readCsv(path: string): Promise<GeometryTempFile> {
   return new Promise((resolve, reject) => {
-    const out: GeometryTmpFile = {};
-    let i = 0;
+    const out: GeometryTempFile = {};
+    let index = 0;
 
     createReadStream(path)
       .pipe(csv())
       .on('data', (data: GeometryIn) => {
-        if (!(i % 1000)) process.stdout.write('.');
-        i += 1;
+        if (!(index % 1000)) process.stdout.write('.');
+        index += 1;
 
         const ref = +data.name_id;
 
@@ -49,7 +49,7 @@ async function readCsv(path: string): Promise<GeometryTmpFile> {
         }
 
         /** cause of the BOM character at the start of the csv file we do this */
-        const WKT = data.WKT || data['\ufeffWKT' as 'WKT'];
+        const WKT = data.WKT || data['\uFEFFWKT' as 'WKT'];
 
         let geom = wktToGeoJson(WKT);
         if (!geom) {
@@ -60,26 +60,38 @@ async function readCsv(path: string): Promise<GeometryTmpFile> {
         // simplify geometry because LINZ uses way too many coordinates
         // this cuts down the file from 150MB to 55MB. Same code as the
         // 2021 topo50 import.
-        if (geom.type === 'LineString') {
-          // Coord[]
-          geom.coordinates = simplify(geom.coordinates, WAY_SIMPLIFICATION);
-        } else if (geom.type === 'MultiLineString' || geom.type === 'Polygon') {
-          // Coord[][]
-          geom.coordinates = geom.coordinates.map((line) =>
-            simplify(line, WAY_SIMPLIFICATION),
-          );
-          // Try to simplify MultiLineString down to a LineString if it only
-          // has one member.
-          if (geom.coordinates.length === 1) {
-            geom = { type: 'LineString', coordinates: geom.coordinates[0] };
+        switch (geom.type) {
+          case 'LineString': {
+            // Coord[]
+            geom.coordinates = simplify(geom.coordinates, WAY_SIMPLIFICATION);
+
+            break;
           }
-        } else if (geom.type === 'MultiPolygon') {
-          // Coord[][][]
-          geom.coordinates = geom.coordinates.map((member) =>
-            member.map((ring) => simplify(ring, WAY_SIMPLIFICATION)),
-          );
-        } else {
-          console.log('\tUnexpected geomtry type', geom.type);
+          case 'MultiLineString':
+          case 'Polygon': {
+            // Coord[][]
+            geom.coordinates = geom.coordinates.map((line) =>
+              simplify(line, WAY_SIMPLIFICATION),
+            );
+            // Try to simplify MultiLineString down to a LineString if it only
+            // has one member.
+            if (geom.coordinates.length === 1) {
+              geom = { type: 'LineString', coordinates: geom.coordinates[0] };
+            }
+
+            break;
+          }
+          case 'MultiPolygon': {
+            // Coord[][][]
+            geom.coordinates = geom.coordinates.map((member) =>
+              member.map((ring) => simplify(ring, WAY_SIMPLIFICATION)),
+            );
+
+            break;
+          }
+          default: {
+            console.log('\tUnexpected geomtry type', geom.type);
+          }
         }
 
         out[ref] = { name: data.name, geom };

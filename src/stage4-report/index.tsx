@@ -1,4 +1,3 @@
-import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';

@@ -14,10 +14,10 @@ export const toCSV = (doubleArray: (string | number | undefined)[][]): string =>
   doubleArray
     .map((row) =>
       row.map((_cell) => {
-        const cell = `${_cell ?? '❌'}`.replace(/"/g, '""');
+        const cell = `${_cell ?? '❌'}`.replaceAll('"', '""');
         const quoted =
           cell.includes(',') || cell.includes('"') ? `"${cell}"` : cell;
-        return quoted.replace(/\n/g, '↩');
+        return quoted.replaceAll('\n', '↩');
       }),
     )
     .join('\n');

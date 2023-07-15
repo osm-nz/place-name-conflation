@@ -34,7 +34,7 @@ type TempObject = {
 
 // these transformations must be kept to a bare minimum
 const transformName = (_nzgbName: string, type: NameType) => {
-  let nzgbName = _nzgbName.replace(/ Pa$/i, ' Pā');
+  let nzgbName = _nzgbName.replace(/ pa$/i, ' Pā');
 
   // for train stations, OSM doesn't include the suffix in the name
   if (type === 'Railway Station') {
@@ -51,16 +51,16 @@ async function csvToTemp(): Promise<{ out: TempObject; ety: EtymologyReport }> {
       stats: { okay: 0, failed: 0, skipped: 0 },
       list: [],
     };
-    let i = 0;
+    let index = 0;
 
     createReadStream(nzgbCsvPath)
       .pipe(csv())
       .on('data', (data: NZGBCsv) => {
-        if (!(i % 1000)) process.stdout.write('.');
-        i += 1;
+        if (!(index % 1000)) process.stdout.write('.');
+        index += 1;
 
         /** cause of the BOM character at the start of the csv file we do this */
-        const ref = +(data.name_id || data['\ufeffname_id' as 'name_id']);
+        const ref = +(data.name_id || data['\uFEFFname_id' as 'name_id']);
 
         out[data.feat_id] ||= {
           lat: +data.crd_latitude,
@@ -92,7 +92,7 @@ async function csvToTemp(): Promise<{ out: TempObject; ety: EtymologyReport }> {
       })
       .on('end', () => {
         resolve({ out, ety });
-        console.log(`\npart 1 done (${i})`);
+        console.log(`\npart 1 done (${index})`);
       })
       .on('error', reject);
   });
@@ -190,7 +190,7 @@ async function tempToFinal(temp: TempObject, wikidataFile: WikidataFile) {
     const wikidata = ref
       .split(';')
       .map((r) => wikidataFile[+r])
-      .find((x) => x); // find the first truthy value
+      .find(Boolean); // find the first truthy value
 
     if (mainName?.etymology && mainName.etymology !== 0xbad) {
       out[ref].etymology = mainName.etymology;
@@ -231,8 +231,8 @@ async function tempToFinal(temp: TempObject, wikidataFile: WikidataFile) {
 export async function preprocessNZGB(wikidataMap: WikidataFile): Promise<void> {
   console.log('Preprocessing NZGB data...');
   const temp = await csvToTemp();
-  const res = await tempToFinal(temp.out, wikidataMap);
-  await fs.writeFile(nzgbJsonPath, JSON.stringify(res, null, 2));
+  const result = await tempToFinal(temp.out, wikidataMap);
+  await fs.writeFile(nzgbJsonPath, JSON.stringify(result, null, 2));
 
   // hack to move the errors to the end
   temp.ety.list.sort((a) => +!!a[2] || -1);

@@ -20,7 +20,7 @@ function osmToJson(
 ): Promise<void> {
   process.stdout.write('Querying planet...');
   return new Promise((resolve, reject) => {
-    let i = 0;
+    let index = 0;
 
     pbf2json
       .createReadStream({
@@ -29,9 +29,9 @@ function osmToJson(
         leveldb: '/tmposm',
       })
       .pipe(
-        through.obj((item: Item, _e, next) => {
-          if (!(i % 100)) process.stdout.write('.');
-          i += 1;
+        through.obj((item: Item, _, next) => {
+          if (!(index % 100)) process.stdout.write('.');
+          index += 1;
 
           const id = item.tags['ref:linz:place_id'];
 
@@ -81,7 +81,7 @@ function osmToJson(
       )
       .on('finish', () => {
         resolve();
-        console.log(`\n\tdone (${i})`);
+        console.log(`\n\tdone (${index})`);
       })
       .on('error', reject);
   });

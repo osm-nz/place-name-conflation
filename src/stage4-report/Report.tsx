@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import { Fragment } from 'react';
 import { osmPathFilePath } from '../core';
 import { NameType, NZGB_NAME_TYPES } from '../data';
 import { OsmPatchFile, StatsFile } from '../types';

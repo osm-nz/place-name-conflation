@@ -111,7 +111,7 @@ export type OsmPatchFile = FeatureCollection<Geometry, Tags> & {
 
 export type StatsFile = Record<NameType, null | OsmPatchFile['stats']>;
 
-export type GeometryTmpFile = {
+export type GeometryTempFile = {
   [placeId: number]: {
     name: string;
     geom: Geometry;

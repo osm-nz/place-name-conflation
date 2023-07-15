@@ -37,7 +37,7 @@ const bannedWordsRegExp = new RegExp(
 const anyNonTeReoLetters = /[^-ghkmnprtw aeiouāēīōū]/i;
 
 function removeEnglishPrefixesAndSuffixes(name: string): string | undefined {
-  if (name.match(bannedWordsRegExp)) return undefined;
+  if (bannedWordsRegExp.test(name)) return undefined;
 
   const newName = name
     .replace(englishPrefixesRegExp, '')

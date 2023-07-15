@@ -1,4 +1,4 @@
-const NONSENSE = [
+const NONSENSE = new Set([
   'Reipae. Reitu,',
   'Policy',
   'Hay. There',
@@ -11,7 +11,7 @@ const NONSENSE = [
   'original',
   'family',
   'Airman',
-];
+]);
 // maintaining a list of overrides here is probably a crap idea. Better to manually enter the
 // right data into OSM and then the system can ignore that entry.
 const OVERRIDES: Record<number, string | undefined> = {
@@ -31,12 +31,12 @@ const TITLES = new Set(
 // all proper nouns. This makes it trivial to find the end of the name.
 // There are a few excepts like `and` and `von`
 const REGEX_1 =
-  /(N|n)amed (it )?(by .*?)?(after|for|in (honour|memory) of)(( ([A-ZĀĒĪŌŪ(“"]|the|von|and|or|of|family)["”)A-Za-zāēīōūĀĒĪŌŪøäöü./-]*)+)/;
+  /(N|n)amed (it )?(by .*?)?(after|for|in (honour|memory) of)(( (["(A-ZĀĒĪŌŪ“]|the|von|and|or|of|family)[")./A-Za-zäöøüĀāĒēĪīŌōŪū”-]*)+)/;
 
 const isCrap = (match: string, name: string) =>
   match.length < 6 || // very short results are probably not meaningful
   name.includes(match) || // if the final result is just a substring of the name, it's not insightful and not worth tagging
-  NONSENSE.includes(match);
+  NONSENSE.has(match);
 
 export function parseNameEtymology(
   _info: string,
@@ -65,17 +65,17 @@ export function parseNameEtymology(
     // we only allow "." if it's for someone's initials, not if it's a full stop.
     // We have to do this outside the regex to avoid making the regex really complex
     // This converts `J.H. B. Buttress. Who was from Wellington` into `J.H. B. Buttress`
-    for (let i = 0; i < match1.length; i += 1) {
-      if (match1[i] === '.') {
+    for (let index = 0; index < match1.length; index += 1) {
+      if (match1[index] === '.') {
         const wordBeforeDot = match1
-          .slice(0, i)
-          .split(/( |\.|\()/)
+          .slice(0, index)
+          .split(/([ (.])/)
           .at(-1)!;
         const wordIsOkay =
           wordBeforeDot.length === 1 || TITLES.has(wordBeforeDot.toLowerCase());
         if (!wordIsOkay) {
           // console.log('\tRejected', wordBeforeDot);
-          match1 = match1.slice(0, i);
+          match1 = match1.slice(0, index);
         }
       }
     }
