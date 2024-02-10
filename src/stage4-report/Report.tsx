@@ -1,7 +1,7 @@
 import { Fragment } from 'react';
 import { osmPathFilePath } from '../core';
-import { NameType, NZGB_NAME_TYPES } from '../data';
-import { OsmPatchFile, StatsFile } from '../types';
+import { NZGB_NAME_TYPES, type NameType } from '../data';
+import type { OsmPatchFile, StatsFile } from '../types';
 
 const { format: formatNumber } = new Intl.NumberFormat('en-NZ');
 
@@ -170,6 +170,7 @@ export const Report: React.FC<{ data: StatsFile; css: string }> = ({
                     )}
                   </td>
                   <td>{stats && formatNumber(total(stats))}</td>
+                  {/* eslint-disable-next-line jsx-a11y/control-has-associated-label -- bug with the rule */}
                   <td>
                     <Tags type={type} />
                   </td>

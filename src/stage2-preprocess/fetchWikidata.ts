@@ -1,7 +1,7 @@
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { wikidataFile } from '../core';
-import { WikidataFile } from '../types';
+import type { WikidataFile } from '../types';
 
 type WikidataAPI = {
   results: {

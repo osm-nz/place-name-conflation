@@ -1,5 +1,5 @@
-import { Polygon } from 'geojson';
-import { Coord } from '../types';
+import type { Polygon } from 'geojson';
+import type { Coord } from '../types';
 
 const { sin, cos, sqrt, PI: π, atan2 } = Math;
 

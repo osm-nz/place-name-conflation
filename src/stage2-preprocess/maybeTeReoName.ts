@@ -2,8 +2,8 @@ import { readFileSync } from 'node:fs';
 import { englishDictFile } from '../core';
 import {
   ADD_TO_DICTIONARY,
-  DELETE_FROM_DICTIONARY,
   BANNED_WORDS,
+  DELETE_FROM_DICTIONARY,
   ENGLISH_PREFIXES,
   ENGLISH_SUFFIXES,
 } from '../data';

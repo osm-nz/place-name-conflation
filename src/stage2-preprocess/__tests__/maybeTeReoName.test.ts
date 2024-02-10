@@ -1,5 +1,5 @@
 import { maybeTeReoName } from '../maybeTeReoName';
-import { TempName } from '../preprocessNZGB';
+import type { TempName } from '../preprocessNZGB';
 
 const $ = (...names: string[]): TempName[] =>
   names.map((name) => ({

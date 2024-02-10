@@ -1,9 +1,9 @@
-import ReactDOMServer from 'react-dom/server';
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
+import ReactDOMServer from 'react-dom/server';
 import { htmlReport, nzgbIndexPath } from '../core';
+import type { StatsFile } from '../types';
 import { Report } from './Report';
-import { StatsFile } from '../types';
 
 async function main() {
   console.log('Generating report...');

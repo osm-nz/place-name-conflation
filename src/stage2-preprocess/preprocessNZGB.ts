@@ -1,13 +1,13 @@
-import { promises as fs, createReadStream } from 'node:fs';
+import { createReadStream, promises as fs } from 'node:fs';
 import csv from 'csv-parser';
-import {
+import type {
   EtymologyReport,
   NZGBCsv,
   NZGBSourceData,
   Ref,
   WikidataFile,
 } from '../types';
-import { OVERRIDES, NameType, NZGB_NAME_TYPES, IGNORE } from '../data';
+import { IGNORE, NZGB_NAME_TYPES, type NameType, OVERRIDES } from '../data';
 import { etymologyReportPath, nzgbCsvPath, nzgbJsonPath, toCSV } from '../core';
 import { maybeTeReoName } from './maybeTeReoName';
 import { parseNameEtymology } from './parseNameEtymology';
@@ -84,8 +84,8 @@ async function csvToTemp(): Promise<{ out: TempObject; ety: EtymologyReport }> {
           status: data.status.startsWith('Official')
             ? 'O'
             : data.status === 'Unofficial Replaced'
-            ? 'R'
-            : 'U',
+              ? 'R'
+              : 'U',
           teReo: data.maori_name === 'Yes',
           etymology,
         });

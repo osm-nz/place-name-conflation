@@ -1,8 +1,13 @@
 import { promises as fs } from 'node:fs';
-import pbf2json, { Item } from 'pbf2json';
+import pbf2json, { type Item } from 'pbf2json';
 import through from 'through2';
-import { OSMFeature, OSMTempFile } from '../types';
-import { NameType, NZGB_NAME_TYPES, TOP_LEVEL_TAGS, __SKIP } from '../data';
+import type { OSMFeature, OSMTempFile } from '../types';
+import {
+  NZGB_NAME_TYPES,
+  type NameType,
+  TOP_LEVEL_TAGS,
+  __SKIP,
+} from '../data';
 import {
   findTopLevelTags,
   planetFileEast,

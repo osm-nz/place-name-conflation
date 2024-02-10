@@ -1,5 +1,5 @@
-import csv from 'csv-parser';
 import { createReadStream, promises as fs } from 'node:fs';
+import csv from 'csv-parser';
 import { parse as wktToGeoJson } from 'wellknown';
 import {
   nzgbCsvAreasPath,
@@ -10,11 +10,11 @@ import {
 import {
   DONT_IMPORT_AS_AREA,
   IGNORE,
-  NameType,
   NZGB_NAME_TYPES,
+  type NameType,
   __SKIP,
 } from '../data';
-import { GeometryTempFile } from '../types';
+import type { GeometryTempFile } from '../types';
 
 /** tolerance for https://mourner.github.io/simplify-js */
 const WAY_SIMPLIFICATION = 0.00003;

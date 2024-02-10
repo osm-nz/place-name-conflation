@@ -3,13 +3,13 @@ import type { Feature, Geometry } from 'geojson';
 import type { Tags } from 'pbf2json';
 import type { NZGBFeature, OSMFeature } from '../../types';
 import { createDiamond, distanceBetween } from '../../core';
+import { DONT_TRY_TO_MOVE, NZGB_NAME_TYPES, __SKIP } from '../../data';
 import {
-  nameHasSlashForOldName,
-  isUnofficialAndOsmHasMacrons,
   allowSlashInsteadOfOr,
+  isUnofficialAndOsmHasMacrons,
+  nameHasSlashForOldName,
 } from './exceptions';
 import { checkTagsFromFeaturePreset } from './checkTagsFromFeaturePreset';
-import { DONT_TRY_TO_MOVE, NZGB_NAME_TYPES, __SKIP } from '../../data';
 
 // in metres
 const DISTANCE_APART_THRESHOLD_NODE = 2500;

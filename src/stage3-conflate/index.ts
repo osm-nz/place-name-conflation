@@ -1,13 +1,13 @@
 import { promises as fs } from 'node:fs';
-import { Geometry } from 'geojson';
-import {
+import type { Geometry } from 'geojson';
+import type {
   GeometryTempFile,
   NZGBSourceData,
-  OsmPatchFile,
   OSMTempFile,
+  OsmPatchFile,
   StatsFile,
 } from '../types';
-import { NameType, NZGB_NAME_TYPES, __SKIP } from '../data';
+import { NZGB_NAME_TYPES, type NameType, __SKIP } from '../data';
 import {
   extraLayersFile,
   findTopLevelTags,

@@ -1,5 +1,5 @@
 import { distanceBetween } from '../core';
-import { NZGBFeature, OSMFeature } from '../types';
+import type { NZGBFeature, OSMFeature } from '../types';
 import { getPresetTags } from './getPresetTags';
 
 // metres. If the matched feature is further away than this, discard it.
