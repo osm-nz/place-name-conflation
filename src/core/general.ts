@@ -1,6 +1,10 @@
 import type { Tags } from 'pbf2json';
 import { TOP_LEVEL_TAGS } from '../data';
 
+const MAP = { n: 'node', w: 'way', r: 'relation' };
+export const osmIdToLink = (osmId: string) =>
+  `https://osm.org/${MAP[<never>osmId[0]]}/${osmId.slice(1)}`;
+
 export const findTopLevelTags = (tags: Tags) =>
   TOP_LEVEL_TAGS.filter((tag) => {
     if (tag.includes('~')) {

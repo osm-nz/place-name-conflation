@@ -17,7 +17,14 @@ const DISTANCE_APART_THRESHOLD_NODE = 2500;
 // this one is slightly higher since the centroid of the area might be quite far from the NZGB point
 const DISTANCE_APART_THRESHOLD_AREA = 15_000;
 
-export const wikidataErrors: string[] = [];
+export type WikidataErrors = {
+  osmId: string;
+  expected: string;
+  actual: string;
+  lat: number;
+  lng: number;
+};
+export const wikidataErrors: WikidataErrors[] = [];
 
 /** compares the OSM place with the NZGB place and returns a list of issues */
 export function compareFeatures(
@@ -147,9 +154,13 @@ export function compareFeatures(
     if (osm.tags.wikidata) {
       // abort and don't touch the feature if there appears to be duplicate entries in wikidata
       // Fixing this data issue may require editing or merging wikidata items.
-      wikidataErrors.push(
-        `(!) Wikidata tag is wrong on ${osm.osmId} (${osm.tags.wikidata}), should be ${nzgb.qId}`,
-      );
+      wikidataErrors.push({
+        osmId: osm.osmId,
+        expected: nzgb.qId,
+        actual: osm.tags.wikidata,
+        lat: nzgb.lat,
+        lng: nzgb.lng,
+      });
       return undefined;
     }
 
@@ -176,7 +187,7 @@ export function compareFeatures(
     if (existingRef !== ref) {
       // abort and don't touch the feature if someone has already tagged it with a different ref
       // in the source:name tag
-      wikidataErrors.push(
+      console.error(
         `(!) Incorrect source:name tag on ${osm.osmId}, should be “${ref}”`,
       );
       return undefined;

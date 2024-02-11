@@ -17,12 +17,10 @@ import {
   osmPathFilePath,
   tempOsmFile,
 } from '../core';
-import {
-  compareFeatures,
-  wikidataErrors,
-} from './compareFeatures/compareFeatures';
+import { compareFeatures } from './compareFeatures/compareFeatures';
 import { findMatch } from './findMatch';
 import { getPresetTags } from './getPresetTags';
+import { checkWikidataRedirects } from './checkWikidataRedirects';
 
 // baseline: this took 120sec on the very first run (1k refs in the planet)
 function processOneType(
@@ -290,9 +288,11 @@ async function main() {
     }
   }
 
-  console.log(wikidataErrors.join('\n'));
+  extraLayersObject['ZZ Wikidata Redirects'] = await checkWikidataRedirects();
 
   await fs.writeFile(nzgbIndexPath, JSON.stringify(statsObject, null, 2));
   await fs.writeFile(extraLayersFile, JSON.stringify(extraLayersObject));
+
+  console.log('Done');
 }
 main();
