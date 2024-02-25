@@ -12,6 +12,7 @@ const ZERO: Stats = {
   addWayCount: 0,
   editCount: 0,
   okayCount: 0,
+  percentageAnt: 0,
 };
 
 const total = (stats: Stats) =>
@@ -142,6 +143,7 @@ export const Report: React.FC<{ data: StatsFile; css: string }> = ({
               <td>Progress</td>
               <td>Type</td>
               <td>Count</td>
+              <td>🇦🇶</td>
               <td>Tagging</td>
             </tr>
           </thead>
@@ -170,6 +172,11 @@ export const Report: React.FC<{ data: StatsFile; css: string }> = ({
                     )}
                   </td>
                   <td>{stats && formatNumber(total(stats))}</td>
+                  <td>
+                    {stats?.percentageAnt
+                      ? `${formatNumber(stats.percentageAnt)}%`
+                      : null}
+                  </td>
                   {/* eslint-disable-next-line jsx-a11y/control-has-associated-label -- bug with the rule */}
                   <td>
                     <Tags type={type} />

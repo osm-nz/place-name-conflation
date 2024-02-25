@@ -65,6 +65,7 @@ export type NZGBFeature = {
   official?: true;
   altNames?: string[];
   oldNames?: string[];
+  oldRefs?: number[];
   isArea?: true;
   isUndersea?: true;
   etymology?: string;
@@ -106,6 +107,7 @@ export type OsmPatchFile = FeatureCollection<Geometry, Tags> & {
     editCount: number;
     addNodeCount: number;
     addWayCount: number;
+    percentageAnt: number;
   };
 };
 

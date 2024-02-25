@@ -78,7 +78,13 @@ function processOneType(
   const output: OsmPatchFile = {
     type: 'FeatureCollection',
     size: 'large',
-    stats: { okayCount: 0, addNodeCount: 0, addWayCount: 0, editCount: 0 },
+    stats: {
+      okayCount: 0,
+      addNodeCount: 0,
+      addWayCount: 0,
+      editCount: 0,
+      percentageAnt: 0,
+    },
     features: [],
     instructions:
       'Please review and refine suggestions to add `name:mi` or `name:etymology`. These suggestions may not be perfect.',
@@ -92,11 +98,17 @@ function processOneType(
 
     let osmPlace = osmCategory.withRef[ref];
     // we can't immediately find the place, try lookup the other categories
+    // and check for possible invalid/out of date resf
     if (!osmPlace) {
-      for (const category in osm) {
-        const maybeMatch = osm[category].withRef[ref];
-        if (maybeMatch) {
-          osmPlace = maybeMatch;
+      // check all the oldRefs and split the current ref to check if
+      // it's mapped with part of the ref.
+      const potentialIds = [...ref.split(';'), ...(nzgbPlace.oldRefs || [])];
+
+      for (const potentialRef of potentialIds) {
+        osmPlace ||= osmCategory.withRef[potentialRef];
+
+        for (const category in osm) {
+          osmPlace ||= osm[category].withRef[potentialRef];
         }
       }
     }
@@ -164,6 +176,19 @@ function processOneType(
     output.stats.addNodeCount -
     output.stats.addWayCount;
 
+  output.stats.percentageAnt = Math.round(
+    (output.features.filter((f) => {
+      // @ts-expect-error -- hack
+      let firstPair = f.geometry.coordinates;
+      while (typeof firstPair[0] !== 'number') {
+        [firstPair] = firstPair;
+      }
+      return firstPair[1] < -50;
+    }).length /
+      output.features.length) *
+      100,
+  );
+
   console.log(
     `\tComplete (${output.stats.addNodeCount}+${output.stats.addWayCount} missing, ${output.stats.editCount} wrong, ${output.stats.okayCount} okay)\n`,
   );
@@ -219,7 +244,14 @@ async function main() {
   const trivialLayerName = 'ZZ Add Wikidata/Ref';
   extraLayersObject[trivialLayerName] = {
     type: 'FeatureCollection',
-    stats: { addNodeCount: 0, addWayCount: 0, editCount: 0, okayCount: 0 },
+    stats: {
+      addNodeCount: 0,
+      addWayCount: 0,
+      editCount: 0,
+      okayCount: 0,
+      percentageAnt: 0,
+    },
+
     size: 'large',
     instructions:
       'For this layer, a table editor is much more efficient than RapiD',

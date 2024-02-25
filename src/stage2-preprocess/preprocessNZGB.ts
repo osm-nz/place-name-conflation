@@ -183,6 +183,7 @@ async function tempToFinal(temp: TempObject, wikidataFile: WikidataFile) {
         name,
         nameMi: maybeTeReoName(unofficialTeReoNames),
         oldNames: oldNames.length ? oldNames.map((n) => n.name) : undefined,
+        oldRefs: place.names.map((n) => n.ref),
       };
     }
 
