@@ -117,7 +117,9 @@ export function compareFeatures(
   const threshold =
     osm.osmId[0] === 'n'
       ? DISTANCE_APART_THRESHOLD_NODE
-      : DISTANCE_APART_THRESHOLD_AREA;
+      : osm.osmId[0] === 'w'
+        ? DISTANCE_APART_THRESHOLD_AREA
+        : Infinity; // relations are not checked for distance
   if (metresAway > threshold && !DONT_TRY_TO_MOVE.has(nzgb.type)) {
     tagChanges.__action = 'move';
   }

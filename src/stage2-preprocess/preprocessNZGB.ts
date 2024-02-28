@@ -34,7 +34,7 @@ type TempObject = {
 
 // these transformations must be kept to a bare minimum
 const transformName = (_nzgbName: string, type: NameType) => {
-  let nzgbName = _nzgbName.replace(/ pa$/i, ' Pā');
+  let nzgbName = _nzgbName.trim().replace(/ pa$/i, ' Pā');
 
   // for train stations, OSM doesn't include the suffix in the name
   if (type === 'Railway Station') {
@@ -58,6 +58,9 @@ async function csvToTemp(): Promise<{ out: TempObject; ety: EtymologyReport }> {
       .on('data', (data: NZGBCsv) => {
         if (!(index % 1000)) process.stdout.write('.');
         index += 1;
+
+        // "Discontinued" don't exist or completely irrelevant
+        if (data.status.endsWith('Discontinued')) return;
 
         /** cause of the BOM character at the start of the csv file we do this */
         const ref = +(data.name_id || data['\uFEFFname_id' as 'name_id']);

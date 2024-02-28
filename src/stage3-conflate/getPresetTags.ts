@@ -23,12 +23,12 @@ export function getPresetTags(place: NZGBFeature): {
     return {
       all: preset.subseaTags,
       match: preset.subseaTags,
-      acceptTags: preset.acceptTags,
+      acceptTags: [...(preset.acceptTags || []), preset.onLandTags],
     };
   }
   return {
     all: preset.onLandTags,
     match: preset.onLandTags,
-    acceptTags: preset.acceptTags,
+    acceptTags: [...(preset.acceptTags || []), preset.subseaTags],
   };
 }
