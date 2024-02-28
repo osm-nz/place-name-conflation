@@ -109,6 +109,7 @@ export type OsmPatchFile = FeatureCollection<Geometry, Tags> & {
     addWayCount: number;
     percentageAnt: number;
   };
+  changesetTags?: Tags;
 };
 
 export type StatsFile = Record<NameType, null | OsmPatchFile['stats']>;

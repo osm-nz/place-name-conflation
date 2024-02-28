@@ -1,6 +1,9 @@
 import { join } from 'node:path';
 import type { NameType } from '../data';
 
+export const USER_AGNET =
+  'An OpenStreetMap New Zealand project, contact https://github.com/osm-nz';
+
 const repoRoot = join(__dirname, '../..');
 
 export const englishDictFile = join(repoRoot, 'tmp/englishDictionary.json');

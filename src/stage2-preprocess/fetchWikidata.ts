@@ -1,6 +1,6 @@
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
-import { wikidataFile } from '../core';
+import { USER_AGNET, wikidataFile } from '../core';
 import type { WikidataFile } from '../types';
 
 type WikidataAPI = {
@@ -32,7 +32,12 @@ export async function fetchWikidata(): Promise<WikidataFile> {
 
     const request = await fetch(
       `https://query.wikidata.org/sparql?query=${encodeURIComponent(QUERY)}`,
-      { headers: { Accept: 'application/sparql-results+json' } },
+      {
+        headers: {
+          Accept: 'application/sparql-results+json',
+          'User-Agent': USER_AGNET,
+        },
+      },
     );
     const apiResp: WikidataAPI = await request.json();
 
