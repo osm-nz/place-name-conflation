@@ -14,6 +14,10 @@ import {
   planetFileWest,
   tempOsmFile,
 } from '../core';
+import {
+  fetchSouthPoleOsmFeatures,
+  processSouthPoleOsmFeatures,
+} from './fetchSouthPoleOsmFeatures';
 
 const REF_TAG = 'ref:linz:place_id';
 
@@ -59,7 +63,10 @@ function osmToJson(
               // if not, we add it to the __OTHER__ category.
               let alreadySeen = false;
               for (const cat in out) {
-                if (id in out[cat].withRef) alreadySeen = true;
+                if (id in out[cat].withRef) {
+                  alreadySeen = true;
+                  break;
+                }
               }
               if (!alreadySeen) {
                 out.__OTHER__.withRef[id] = feature;
@@ -122,12 +129,20 @@ export async function preprocesOSM(): Promise<void> {
     out[topLevelTag] = { withRef: {}, noRef: [] };
   }
 
+  // first call the overpass API, so we fail fast. Don't want to
+  // wait 5mins to process the planet file only to find out that
+  // there's a network error. However, the processing has to happen
+  // after we're searched the planet file.
+  const southPoleFeatures = await fetchSouthPoleOsmFeatures();
+
   await osmToJson(out, query, planetFileWest);
   await osmToJson(out, query, planetFileEast);
 
   // query again to find anything with a ref that didn't match a preset
   await osmToJson(out, REF_TAG, planetFileWest);
   await osmToJson(out, REF_TAG, planetFileEast);
+
+  await processSouthPoleOsmFeatures(out, southPoleFeatures);
 
   await fs.writeFile(tempOsmFile, JSON.stringify(out));
 }

@@ -11,6 +11,7 @@ export const englishDictFile = join(repoRoot, 'tmp/englishDictionary.json');
 export const planetFileWest = join(repoRoot, 'tmp/osm-west.pbf');
 export const planetFileEast = join(repoRoot, 'tmp/osm-east.pbf');
 export const tempOsmFile = join(repoRoot, 'tmp/osm.json');
+export const southPoleFile = join(repoRoot, 'tmp/southPole.json');
 
 export const osmPathFilePath = (type: NameType) =>
   join(repoRoot, `out/spam/${type}.osmPatch.geo.json`);

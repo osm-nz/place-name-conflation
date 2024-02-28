@@ -51,7 +51,13 @@ export const IGNORE = new Set([
   40232, // Hikurangi Plateau
 
   // outside of the bbox for oceania + antarctica
-  56588, // Southern Ocean
-  49092, // Polheim (am Südpol)
-  48987, // Butcher's Shop :(bottom of the world)
 ]);
+
+/**
+ * features that are outside of the NZ + Antartica bbox.
+ * We query overpass for these ones.
+ */
+export const OUTSIDE_BBOX: (string | number)[] = [
+  56588, // Southern Ocean
+  '60370;57128', // South Pacific Ocean
+];

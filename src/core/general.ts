@@ -1,7 +1,9 @@
 import type { Tags } from 'pbf2json';
 import { TOP_LEVEL_TAGS } from '../data';
 
-const MAP = { n: 'node', w: 'way', r: 'relation' };
+const MAP = { n: 'node', w: 'way', r: 'relation' } as const;
+export type NWR = (typeof MAP)[keyof typeof MAP];
+
 export const osmIdToLink = (osmId: string) =>
   `https://osm.org/${MAP[<never>osmId[0]]}/${osmId.slice(1)}`;
 
