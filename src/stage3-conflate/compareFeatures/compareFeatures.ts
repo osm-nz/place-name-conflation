@@ -6,6 +6,7 @@ import { createDiamond, distanceBetween } from '../../core';
 import { DONT_TRY_TO_MOVE, NZGB_NAME_TYPES, __SKIP } from '../../data';
 import {
   allowSlashInsteadOfOr,
+  allowTrivialDifferences,
   isUnofficialAndOsmHasMacrons,
   nameHasSlashForOldName,
 } from './exceptions';
@@ -35,6 +36,7 @@ export function compareFeatures(
       nameHasSlashForOldName(nzgb, osm),
       isUnofficialAndOsmHasMacrons(nzgb, osm),
       allowSlashInsteadOfOr(nzgb, osm),
+      allowTrivialDifferences(nzgb, osm),
     ];
     // if every exception is false, then propose changing the name
     if (exceptions.every((x) => !x)) {

@@ -45,3 +45,20 @@ export function isUnofficialAndOsmHasMacrons(
 export function allowSlashInsteadOfOr(nzgb: NZGBFeature, osm: OSMFeature) {
   return nzgb.name.replaceAll(' or ', ' / ') === osm.tags.name;
 }
+
+/** @internal */
+function normaliseTrivialNameDifferences(name: string) {
+  return name.replace(/\bMount\b/, 'Mt').replace(/\bSaint\b/, 'St');
+}
+
+/**
+ * Allow some deviations to the spelling, in cases where there
+ * is ongoing dispute (e.g. Saint vs St) or where the different
+ * is pretty trivial. (e.g. Mount vs Mt)
+ */
+export function allowTrivialDifferences(nzgb: NZGBFeature, osm: OSMFeature) {
+  return (
+    normaliseTrivialNameDifferences(nzgb.name) ===
+    normaliseTrivialNameDifferences(osm.tags.name || '')
+  );
+}

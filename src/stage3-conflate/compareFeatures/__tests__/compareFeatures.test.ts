@@ -30,6 +30,12 @@ function conflateTags(
 }
 
 describe('compareFeatures', () => {
+  it('suggests fixing names', () => {
+    expect(
+      conflateTags({ name: 'correct name' }, { name: 'wrong name' }),
+    ).toStrictEqual({ name: 'correct name' });
+  });
+
   it('accepts if the legacy names are in not:name/alt_name/old_name', () => {
     expect(
       conflateTags(
@@ -371,6 +377,16 @@ describe('compareFeatures', () => {
           { name: 'Winter Spring', natural: 'wssdfsdfw' },
         ),
       ).toStrictEqual({ natural: 'spring' }); // default preset is suggested
+    });
+
+    it.each`
+      nzgb              | osm
+      ${'Saint Martin'} | ${'St Martin'}
+      ${'St Martin'}    | ${'Saint Martin'}
+      ${'Mt Martin'}    | ${'Mount Martin'}
+      ${'Mount martin'} | ${'Mt martin'}
+    `('accepts an inconsistency between $nzgb & $osm', ({ nzgb, osm }) => {
+      expect(conflateTags({ name: nzgb }, { name: osm })).toBeUndefined();
     });
   });
 });
