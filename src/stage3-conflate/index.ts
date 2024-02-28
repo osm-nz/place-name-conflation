@@ -21,6 +21,7 @@ import { compareFeatures } from './compareFeatures/compareFeatures';
 import { findMatch } from './findMatch';
 import { getPresetTags } from './getPresetTags';
 import { checkWikidataRedirects } from './checkWikidataRedirects';
+import { applyCustomMerges } from './applyCustomMerges';
 
 // baseline: this took 120sec on the very first run (1k refs in the planet)
 function processOneType(
@@ -233,6 +234,8 @@ async function main() {
     await fs.readFile(nzgbJsonGeometryPath, 'utf8'),
   );
   const osm: OSMTempFile = JSON.parse(await fs.readFile(tempOsmFile, 'utf8'));
+
+  applyCustomMerges(nzgb, osm);
 
   const statsObject: Partial<StatsFile> = {};
   const extraLayersObject: Record<string, OsmPatchFile> = {};

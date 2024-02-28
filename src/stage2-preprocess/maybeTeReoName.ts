@@ -36,7 +36,9 @@ const bannedWordsRegExp = new RegExp(
 // eslint-disable-next-line unicorn/better-regex -- it's more clear written out like this
 const anyNonTeReoLetters = /[^-ghkmnprtw aeiouāēīōū]/i;
 
-function removeEnglishPrefixesAndSuffixes(name: string): string | undefined {
+export function removeEnglishPrefixesAndSuffixes(
+  name: string,
+): string | undefined {
   if (bannedWordsRegExp.test(name)) return undefined;
 
   const newName = name
