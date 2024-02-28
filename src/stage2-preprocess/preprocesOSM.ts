@@ -32,6 +32,9 @@ function osmToJson(
         file: planetFile,
         tags: [query],
         leveldb: '/tmposm',
+        // @ts-expect-error -- missing from typedefs since we
+        //                     added this option in our fork.
+        metadata: true,
       })
       .pipe(
         through.obj((item: Item, _, next) => {

@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "csv-parser": "^3.0.0",
-    "pbf2json": "^6.10.0",
+    "pbf2json": "https://github.com/osm-nz/pbf2json",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "through2": "^4.0.2",
