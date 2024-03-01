@@ -3,6 +3,7 @@ import type { Geometry } from 'geojson';
 import type {
   GeometryTempFile,
   NZGBSourceData,
+  OSMFeature,
   OSMTempFile,
   OsmPatchFile,
   StatsFile,
@@ -29,6 +30,7 @@ function processOneType(
   nzgb: NZGBSourceData,
   nzgbGeom: GeometryTempFile,
   osm: OSMTempFile,
+  allOsmFeaturesWithRef: Record<string, OSMFeature>,
 ) {
   console.log(type);
   console.log('\tReading files...');
@@ -50,26 +52,19 @@ function processOneType(
           ...findTopLevelTags(categoryDefinition.subseaTags),
         ];
 
-  let osmCategory: OSMTempFile[string];
+  /**
+   * OSM feature that have the right tags for this
+   * preset, but they have no ref tag
+   */
+  const noReferencesWithThisPreset: OSMFeature[] = [];
   if (presets.length === 0) {
     throw new Error('Preset error run `yarn 2`');
-  } else if (presets.length === 1) {
-    osmCategory = osm[presets[0]];
-    if (!osmCategory) {
+  }
+  for (const preset of presets) {
+    if (!osm[preset]) {
       throw new Error('Preset error run `yarn 2`');
     }
-  } else {
-    osmCategory = {
-      noRef: [],
-      withRef: {},
-    };
-    for (const preset of presets) {
-      if (!osm[preset]) {
-        throw new Error('Preset error run `yarn 2`');
-      }
-      osmCategory.noRef.push(...osm[preset].noRef);
-      Object.assign(osmCategory.withRef, osm[preset].withRef);
-    }
+    noReferencesWithThisPreset.push(...osm[preset].noRef);
   }
 
   let total = 0;
@@ -95,7 +90,7 @@ function processOneType(
 
     total += 1;
 
-    let osmPlace = osmCategory.withRef[ref];
+    let osmPlace = allOsmFeaturesWithRef[ref];
     // we can't immediately find the place, try lookup the other categories
     // and check for possible invalid/out of date resf
     if (!osmPlace) {
@@ -104,11 +99,7 @@ function processOneType(
       const potentialIds = [...ref.split(';'), ...(nzgbPlace.oldRefs || [])];
 
       for (const potentialRef of potentialIds) {
-        osmPlace ||= osmCategory.withRef[potentialRef];
-
-        for (const category in osm) {
-          osmPlace ||= osm[category].withRef[potentialRef];
-        }
+        osmPlace ||= allOsmFeaturesWithRef[potentialRef];
       }
     }
 
@@ -118,7 +109,7 @@ function processOneType(
       if (action) output.features.push(action);
     } else {
       // there is no OSM feature with a ref, so try to search by name
-      const matchFound = findMatch(nzgbPlace, osmCategory.noRef);
+      const matchFound = findMatch(nzgbPlace, noReferencesWithThisPreset);
       if (matchFound) {
         // Case B: We think we've found a match
         const action = compareFeatures(ref, nzgbPlace, matchFound);
@@ -141,8 +132,8 @@ function processOneType(
 
             name: nzgbPlace.name,
             'name:mi': nzgbPlace.nameMi,
-            alt_name: nzgbPlace.altNames?.join(';'),
-            old_name: nzgbPlace.oldNames?.join(';'),
+            alt_name: nzgbPlace.altNames?.join(';') || undefined,
+            old_name: nzgbPlace.oldNames?.join(';') || undefined,
             'ref:linz:place_id': ref,
 
             wikidata: nzgbPlace.qId,
@@ -208,24 +199,6 @@ const trivialKeys = new Set([
   'old_name',
 ]);
 
-// temp - eventually move everything out of ZZ
-const publish: Partial<Record<NameType, true>> = {
-  Hill: true,
-  Locality: true,
-  Bay: true,
-  Point: true,
-  Island: true,
-  Lake: true,
-  Ridge: true,
-  Range: true,
-  Site: true,
-  Rock: true,
-  Cliff: true,
-  Flat: true,
-  Place: true,
-  Beach: true,
-};
-
 async function main() {
   const nzgb: NZGBSourceData = JSON.parse(
     await fs.readFile(nzgbJsonPath, 'utf8'),
@@ -236,6 +209,11 @@ async function main() {
   const osm: OSMTempFile = JSON.parse(await fs.readFile(tempOsmFile, 'utf8'));
 
   applyCustomMerges(nzgb, osm);
+
+  const allOsmFeaturesWithRef: Record<string, OSMFeature> = {};
+  for (const cat in osm) {
+    Object.assign(allOsmFeaturesWithRef, osm[cat].withRef);
+  }
 
   const statsObject: Partial<StatsFile> = {};
   const extraLayersObject: Record<string, OsmPatchFile> = {};
@@ -265,7 +243,13 @@ async function main() {
     if (object === __SKIP) {
       statsObject[type] = null;
     } else {
-      const osmPatch = processOneType(type, nzgb, nzgbGeom, osm);
+      const osmPatch = processOneType(
+        type,
+        nzgb,
+        nzgbGeom,
+        osm,
+        allOsmFeaturesWithRef,
+      );
       await fs.writeFile(
         osmPathFilePath(type),
         JSON.stringify(osmPatch, null, 2),
@@ -287,7 +271,7 @@ async function main() {
         }
       }
 
-      extraLayersObject[`${publish[type] ? 'Z' : 'ZZ'} ${type}`] = osmPatch;
+      extraLayersObject[`Z ${type}`] = osmPatch;
     }
   }
 
