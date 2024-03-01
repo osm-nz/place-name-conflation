@@ -31,7 +31,12 @@ export function findMatch(
 ): OSMFeature | undefined {
   const stripedNzgbName = stripDownName(nzgb.name);
   const matches = osmFeatures
-    .filter((element) => stripDownName(element.tags.name!) === stripedNzgbName)
+    .filter(
+      (element) =>
+        // match by name or qId
+        stripDownName(element.tags.name!) === stripedNzgbName ||
+        (nzgb.qId && nzgb.qId === element.tags.wikidata),
+    )
     .map((element) => ({
       el: element,
       distance: distanceBetween(nzgb.lat, nzgb.lng, element.lat, element.lng),
