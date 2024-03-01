@@ -24,6 +24,7 @@ const REF_TAG = 'ref:linz:place_id';
 /* eslint-disable no-param-reassign -- returns nothing, mutates the first 2 arguments instead */
 function osmToJson(
   out: OSMTempFile,
+  duplicates: Set<string>,
   query: string,
   planetFile: string,
 ): Promise<void> {
@@ -63,8 +64,12 @@ function osmToJson(
               // if not, we add it to the __OTHER__ category.
               let alreadySeen = false;
               for (const cat in out) {
-                if (id in out[cat].withRef) {
+                const thisFeature = out[cat].withRef[id];
+                if (thisFeature) {
                   alreadySeen = true;
+                  if (thisFeature.osmId !== feature.osmId) {
+                    duplicates.add(id);
+                  }
                   break;
                 }
               }
@@ -84,6 +89,9 @@ function osmToJson(
 
             for (const topLevelTag of topLevelTags) {
               if (id) {
+                if (out[topLevelTag].withRef[id]) {
+                  duplicates.add(id);
+                }
                 out[topLevelTag].withRef[id] = feature;
               } else {
                 out[topLevelTag].noRef.push(feature);
@@ -135,14 +143,18 @@ export async function preprocesOSM(): Promise<void> {
   // after we're searched the planet file.
   const southPoleFeatures = await fetchSouthPoleOsmFeatures();
 
-  await osmToJson(out, query, planetFileWest);
-  await osmToJson(out, query, planetFileEast);
+  const duplicates = new Set<string>();
+  await osmToJson(out, duplicates, query, planetFileWest);
+  await osmToJson(out, duplicates, query, planetFileEast);
 
   // query again to find anything with a ref that didn't match a preset
-  await osmToJson(out, REF_TAG, planetFileWest);
-  await osmToJson(out, REF_TAG, planetFileEast);
+  await osmToJson(out, duplicates, REF_TAG, planetFileWest);
+  await osmToJson(out, duplicates, REF_TAG, planetFileEast);
 
-  await processSouthPoleOsmFeatures(out, southPoleFeatures);
+  await processSouthPoleOsmFeatures(out, duplicates, southPoleFeatures);
 
   await fs.writeFile(tempOsmFile, JSON.stringify(out));
+  if (duplicates.size) {
+    console.warn('(!) Duplicate refs in OSM:', duplicates);
+  }
 }

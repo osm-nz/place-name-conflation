@@ -60,6 +60,7 @@ export async function fetchSouthPoleOsmFeatures() {
 /* eslint-disable no-param-reassign -- returns nothing, mutates the first 2 arguments instead */
 export async function processSouthPoleOsmFeatures(
   out: OSMTempFile,
+  duplicates: Set<string>,
   apiResponse: OverpassFeature[],
 ) {
   out.__OTHER__ ||= { withRef: {}, noRef: [] };
@@ -78,8 +79,12 @@ export async function processSouthPoleOsmFeatures(
     // if not, we add it to the __OTHER__ category.
     let alreadySeen = false;
     for (const cat in out) {
-      if (id in out[cat].withRef) {
+      const thisFeature = out[cat].withRef[id];
+      if (thisFeature) {
         alreadySeen = true;
+        if (thisFeature.osmId !== feature.osmId) {
+          duplicates.add(id);
+        }
         break;
       }
     }
