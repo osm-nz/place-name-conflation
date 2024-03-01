@@ -234,7 +234,7 @@ const _NZGB_NAME_TYPES = {
   'Railway Line': {
     tags: { type: 'route', route: 'railway' },
     acceptTags: [{ type: 'route', route: 'train' }], // exception for vintage railways
-    chillMode: true,
+    chillMode: 'official_name',
   },
   'Railway Station': {
     tags: { railway: 'station' },
@@ -365,7 +365,10 @@ const _NZGB_NAME_TYPES = {
       'seamark:sea_area:category': 'sill',
     },
   },
-  Site: { tags: { place: 'locality' } },
+  Site: {
+    tags: { place: 'locality' },
+    chillMode: 'alt_name', // official_name wouldn't be right for marae and pā
+  },
   Slope: {
     tags: {
       'seamark:type': 'sea_area',
@@ -401,7 +404,7 @@ const _NZGB_NAME_TYPES = {
   },
   'Trig Station': {
     tags: { man_made: 'survey_point' },
-    chillMode: true, // prefer the names from LINZ's geodetic dataset
+    chillMode: 'official_name', // prefer the names from LINZ's geodetic dataset
   },
   Trough: {
     tags: {
@@ -480,8 +483,11 @@ type TypeMap = Record<
       /** alternative tagging methods to accept */
       acceptTags?: Tags[];
 
-      /** if true, we allow the `name` tag to have any value, and we maintain the `official_name` tag instead */
-      chillMode?: boolean;
+      /**
+       * if truthy, we allow the `name` tag to have any value, and
+       * we maintain the `official_name` or `alt_name` tag instead
+       */
+      chillMode?: 'official_name' | 'alt_name';
     } & (
       | {
           /** the primary tag(s) for the feature, used when searching the planet  */

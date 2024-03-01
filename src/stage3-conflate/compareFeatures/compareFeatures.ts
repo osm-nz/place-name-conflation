@@ -52,12 +52,14 @@ export function compareFeatures(
   }
 
   // 1b. In chill mode, we only care if `official_name` is correct.
+  //     (In very rare cases we allow `alt_name` instead of
+  //     `official_name`, e.g. for marae)
   if (
     preset.chillMode &&
-    osm.tags.official_name !== nzgb.name &&
+    osm.tags[preset.chillMode] !== nzgb.name &&
     osm.tags.name !== nzgb.name // no need for `official_name` if `name` is the official one
   ) {
-    tagChanges.official_name = nzgb.name;
+    tagChanges[preset.chillMode] = nzgb.name;
   }
 
   // 2. Check `name:mi`
@@ -73,6 +75,10 @@ export function compareFeatures(
 
   // 3. Check `alt_name`
   const osmAltNames = osm.tags.alt_name?.split(';') || [];
+  if (osm.tags['name:mi']) {
+    // name:mi is a valid alternative to using alt_name
+    osmAltNames.push(...osm.tags['name:mi'].split(';'));
+  }
   if (osm.tags['alt_name:mi']) {
     osmAltNames.push(...osm.tags['alt_name:mi'].split(';'));
   }
