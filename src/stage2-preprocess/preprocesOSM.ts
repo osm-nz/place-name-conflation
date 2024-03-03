@@ -89,7 +89,8 @@ function osmToJson(
 
             for (const topLevelTag of topLevelTags) {
               if (id) {
-                if (out[topLevelTag].withRef[id]) {
+                const existing = out[topLevelTag].withRef[id];
+                if (existing && existing.osmId !== feature.osmId) {
                   duplicates.add(id);
                 }
                 out[topLevelTag].withRef[id] = feature;

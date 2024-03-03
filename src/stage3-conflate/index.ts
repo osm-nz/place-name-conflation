@@ -46,7 +46,10 @@ function processOneType(
   // for on land vs subsea, then we merge two categories together
   const presets =
     'tags' in categoryDefinition
-      ? findTopLevelTags(categoryDefinition.tags)
+      ? [
+          ...findTopLevelTags(categoryDefinition.tags),
+          ...(categoryDefinition.acceptTags?.flatMap(findTopLevelTags) || []),
+        ]
       : [
           ...findTopLevelTags(categoryDefinition.onLandTags),
           ...findTopLevelTags(categoryDefinition.subseaTags),
@@ -191,7 +194,7 @@ const trivialKeys = new Set([
   'ref:linz:place_id',
   'wikidata',
   'wikipedia',
-  'name:etymology', // only if there is also name:ety:wikidata
+  'name:etymology',
   'name:etymology:wikidata',
   'source:name',
   'source',
@@ -260,10 +263,7 @@ async function main() {
         // if the only thing being editted is the ref tag or wikidata or wikipedia tag
         const isTrivial =
           f.properties.__action === 'edit' &&
-          Object.keys(f.properties).every((key) => trivialKeys.has(key)) &&
-          // either both name:ety & wikidata, or niether
-          !!f.properties['name:etymology'] ===
-            !!f.properties['name:etymology:wikidata'];
+          Object.keys(f.properties).every((key) => trivialKeys.has(key));
 
         if (isTrivial) {
           extraLayersObject[trivialLayerName].features.push(f);

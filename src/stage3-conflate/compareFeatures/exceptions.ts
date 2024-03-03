@@ -1,3 +1,4 @@
+import { ALLOW_INCONSISTENT_DIACRITICS } from '../../data';
 import type { NZGBFeature, OSMFeature } from '../../types';
 
 /**
@@ -21,6 +22,26 @@ export function nameHasSlashForOldName(nzgb: NZGBFeature, osm: OSMFeature) {
   );
 }
 
+/** @internal @returns true if the names are similar enough */
+function isPrettyMuchEqual(nzgbName: string, osmName: string) {
+  // the number of charcaters must be the same
+  if (nzgbName.length !== osmName.length) return false;
+
+  for (let index = 0; index < nzgbName.length; index++) {
+    // compare letter-by-letter
+    const nzgbChar = nzgbName[index];
+    const osmChar = osmName[index];
+
+    const isOkay =
+      nzgbChar === osmChar ||
+      nzgbChar === osmChar.normalize('NFD').replaceAll(/\p{Diacritic}/gu, '');
+
+    if (!isOkay) return false;
+  }
+
+  return true;
+}
+
 /**
  * Special case to allow OSM to have macrons, if the NZGB name is unofficial.
  * @returns true if this is an exception and we shouldn't change the name
@@ -29,11 +50,15 @@ export function isUnofficialAndOsmHasMacrons(
   nzgb: NZGBFeature,
   osm: OSMFeature,
 ) {
-  if (nzgb.official) return false;
+  // for official names, an inconsistency is only
+  // acceptable if there's an override for this ref.
+  const shouldAllowInconsistency = nzgb.official
+    ? ALLOW_INCONSISTENT_DIACRITICS.has(osm.tags['ref:linz:place_id']!)
+    : true;
 
   return (
-    nzgb.name?.normalize('NFD').replaceAll(/\p{Diacritic}/gu, '') ===
-    osm.tags.name?.normalize('NFD').replaceAll(/\p{Diacritic}/gu, '')
+    shouldAllowInconsistency &&
+    isPrettyMuchEqual(nzgb.name, osm.tags.name || '')
   );
 }
 
@@ -48,7 +73,10 @@ export function allowSlashInsteadOfOr(nzgb: NZGBFeature, osm: OSMFeature) {
 
 /** @internal */
 function normaliseTrivialNameDifferences(name: string) {
-  return name.replace(/\bMount\b/, 'Mt').replace(/\bSaint\b/, 'St');
+  return name
+    .replace(/\bMount\b/, 'Mt')
+    .replace(/\bSaint\b/, 'St')
+    .replace(/\bSt\./, 'St');
 }
 
 /**
@@ -73,7 +101,9 @@ export function allowDualNames(nzgb: NZGBFeature, osm: OSMFeature) {
   return (
     nameSegments?.length === 2 &&
     nameSegments.every(
-      (segment) => segment === nzgb.name || segment === osm.tags['name:mi'],
+      (segment) =>
+        isPrettyMuchEqual(nzgb.name, segment) ||
+        segment === osm.tags['name:mi'],
     )
   );
 }

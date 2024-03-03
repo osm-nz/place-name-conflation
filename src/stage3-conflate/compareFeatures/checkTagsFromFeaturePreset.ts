@@ -32,10 +32,24 @@ function osmRemoveLifecyclePrefix(key: string) {
   return key;
 }
 
+/**
+ * This converts an object like:
+ * ```js
+ * { place: 'suburb', 'not:place': 'island' }
+ * ```
+ * into:
+ * ```js
+ * { place: ['suburb', 'island'] }
+ * ```
+ */
 function stripAllLifecyclePrefixes(tags: Tags) {
-  const out: Tags = {};
+  const out: Record<string, Set<string>> = {};
   for (const [key, value] of Object.entries(tags)) {
-    out[osmRemoveLifecyclePrefix(key)] = value;
+    if (value) {
+      const stripedKey = osmRemoveLifecyclePrefix(key);
+      out[stripedKey] ||= new Set<string>();
+      out[stripedKey].add(value);
+    }
   }
   return out;
 }
@@ -60,11 +74,13 @@ export function checkTagsFromFeaturePreset(
     const tagChanges: Tags = {};
 
     for (const [key, value] of Object.entries(presetToCheck)) {
+      const osmTagValues = [...(cleanedOsmTags[key] || [])];
       const isTagWrong =
-        value === '*' ? !cleanedOsmTags[key] : cleanedOsmTags[key] !== value;
+        !osmTagValues.length ||
+        (value !== '*' && osmTagValues.every((v) => v !== value));
 
       if (isTagWrong) {
-        if (key === 'seamark:type' && cleanedOsmTags[key]) {
+        if (key === 'seamark:type' && !!osmTagValues.length) {
           // don't try to change seamark:type if it already has a more useful value
           // e.g. seamark:type=obstruction cf. seamark:type=sea_area
           // but if it's missing, we will add it

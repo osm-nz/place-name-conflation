@@ -1,5 +1,9 @@
 import type { NZGBSourceData, Ref } from '../types';
 
+export const ALLOW_INCONSISTENT_DIACRITICS = new Set<string>([
+  //
+]);
+
 export const OVERRIDES: Record<Ref, Partial<NZGBSourceData[string]>> = {
   '7006;6879': { name: 'Whanganui' },
   47427: { name: 'Whanganui East' },

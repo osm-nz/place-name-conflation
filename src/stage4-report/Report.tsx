@@ -115,7 +115,7 @@ export const Report: React.FC<{ data: StatsFile; css: string }> = ({
         stats.addNodeCount + stats.addWayCount + stats.editCount;
       if (remaining === 0) {
         layerCount.okayCount += 1; // complete
-      } else if (remaining / stats.okayCount > 0.9) {
+      } else if (remaining / (stats.okayCount + remaining) < 0.1) {
         layerCount.editCount += 1; // >90% complete
       } else {
         layerCount.addNodeCount += 1; // incomplete

@@ -54,8 +54,7 @@ describe('compareFeatures', () => {
     ).toBeUndefined();
   });
 
-  // TODO: not sure why this test is failing
-  it.skip('does override name:mi if `name` is being changed', () => {
+  it('does override name:mi if `name` is being changed', () => {
     expect(
       conflateTags(
         { name: 'Ōtāhuhu Creek', nameMi: 'Ōtāhuhu' },
@@ -104,10 +103,25 @@ describe('compareFeatures', () => {
     ).toBeUndefined();
   });
 
+  it('allows the OSM feature to have more macrons if the NZGB has no official name', () => {
+    expect(
+      conflateTags(
+        { name: 'Ōtuwharekai', official: undefined },
+        { name: 'Ōtūwharekai' },
+      ),
+    ).toBeUndefined();
+  });
+
   it('does not apply the above exception for features that have an official name', () => {
     expect(
       conflateTags({ name: 'Puhoi', official: true }, { name: 'Pūhoi' }),
     ).toStrictEqual({ name: 'Puhoi' });
+    expect(
+      conflateTags(
+        { name: 'Ōtuwharekai', official: true },
+        { name: 'Ōtūwharekai' },
+      ),
+    ).toStrictEqual({ name: 'Ōtuwharekai' });
   });
 
   it('allows OSM to use a slash instead of the word "or"', () => {
@@ -378,6 +392,15 @@ describe('compareFeatures', () => {
         ),
       ).toStrictEqual({ natural: 'spring' }); // default preset is suggested
     });
+
+    it('accepts lifecycle prefixes that duplicate a normal key', () => {
+      expect(
+        conflateTags(
+          { name: 'X', type: 'Island' },
+          { name: 'X', place: 'suburb', 'not:place': 'island' },
+        ),
+      ).toBeUndefined();
+    });
   });
 
   describe('exceptions', () => {
@@ -385,6 +408,8 @@ describe('compareFeatures', () => {
       nzgb              | osm
       ${'Saint Martin'} | ${'St Martin'}
       ${'St Martin'}    | ${'Saint Martin'}
+      ${'St. Martin'}   | ${'Saint Martin'}
+      ${'St. Martin'}   | ${'St Martin'}
       ${'Mt Martin'}    | ${'Mount Martin'}
       ${'Mount martin'} | ${'Mt martin'}
     `('accepts an inconsistency between $nzgb & $osm', ({ nzgb, osm }) => {
@@ -395,7 +420,7 @@ describe('compareFeatures', () => {
   it('allows dual names in the name tag', () => {
     expect(
       conflateTags(
-        { name: 'Ōmanawa Falls' },
+        { name: 'Omanawa Falls' },
         {
           name: 'Te Rere o Ōmanawa / Ōmanawa Falls',
           'name:mi': 'Te Rere o Ōmanawa',
