@@ -62,3 +62,18 @@ export function allowTrivialDifferences(nzgb: NZGBFeature, osm: OSMFeature) {
     normaliseTrivialNameDifferences(osm.tags.name || '')
   );
 }
+
+/**
+ * Allow name:mi to be repeated in the name tag for dual names
+ * that are separated by a `/`
+ */
+export function allowDualNames(nzgb: NZGBFeature, osm: OSMFeature) {
+  const nameSegments = osm.tags.name?.split(' / ');
+
+  return (
+    nameSegments?.length === 2 &&
+    nameSegments.every(
+      (segment) => segment === nzgb.name || segment === osm.tags['name:mi'],
+    )
+  );
+}

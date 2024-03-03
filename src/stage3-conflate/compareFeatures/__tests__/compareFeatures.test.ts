@@ -378,7 +378,9 @@ describe('compareFeatures', () => {
         ),
       ).toStrictEqual({ natural: 'spring' }); // default preset is suggested
     });
+  });
 
+  describe('exceptions', () => {
     it.each`
       nzgb              | osm
       ${'Saint Martin'} | ${'St Martin'}
@@ -388,5 +390,17 @@ describe('compareFeatures', () => {
     `('accepts an inconsistency between $nzgb & $osm', ({ nzgb, osm }) => {
       expect(conflateTags({ name: nzgb }, { name: osm })).toBeUndefined();
     });
+  });
+
+  it('allows dual names in the name tag', () => {
+    expect(
+      conflateTags(
+        { name: 'Ōmanawa Falls' },
+        {
+          name: 'Te Rere o Ōmanawa / Ōmanawa Falls',
+          'name:mi': 'Te Rere o Ōmanawa',
+        },
+      ),
+    ).toBeUndefined();
   });
 });
