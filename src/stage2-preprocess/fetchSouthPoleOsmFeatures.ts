@@ -13,7 +13,7 @@ type OverpassFeature = {
   tags: Record<string, string>;
 };
 
-export async function fetchSouthPoleOsmFeatures() {
+export async function fetchSomeOsmFeaturesFromOverpass() {
   if (existsSync(southPoleFile)) {
     console.log('Using cached south pole features.');
     const elements: OverpassFeature[] = JSON.parse(
@@ -58,7 +58,7 @@ export async function fetchSouthPoleOsmFeatures() {
  * south of the -85th parallel.
  */
 /* eslint-disable no-param-reassign -- returns nothing, mutates the first 2 arguments instead */
-export async function processSouthPoleOsmFeatures(
+export async function processOverpassFeatures(
   out: OSMTempFile,
   duplicates: Set<string>,
   apiResponse: OverpassFeature[],

@@ -15,8 +15,8 @@ import {
   tempOsmFile,
 } from '../core';
 import {
-  fetchSouthPoleOsmFeatures,
-  processSouthPoleOsmFeatures,
+  fetchSomeOsmFeaturesFromOverpass,
+  processOverpassFeatures,
 } from './fetchSouthPoleOsmFeatures';
 
 const REF_TAG = 'ref:linz:place_id';
@@ -142,7 +142,7 @@ export async function preprocesOSM(): Promise<void> {
   // wait 5mins to process the planet file only to find out that
   // there's a network error. However, the processing has to happen
   // after we're searched the planet file.
-  const southPoleFeatures = await fetchSouthPoleOsmFeatures();
+  const overpassFeatures = await fetchSomeOsmFeaturesFromOverpass();
 
   const duplicates = new Set<string>();
   await osmToJson(out, duplicates, query, planetFileWest);
@@ -152,7 +152,7 @@ export async function preprocesOSM(): Promise<void> {
   await osmToJson(out, duplicates, REF_TAG, planetFileWest);
   await osmToJson(out, duplicates, REF_TAG, planetFileEast);
 
-  await processSouthPoleOsmFeatures(out, duplicates, southPoleFeatures);
+  await processOverpassFeatures(out, duplicates, overpassFeatures);
 
   await fs.writeFile(tempOsmFile, JSON.stringify(out));
   if (duplicates.size) {
