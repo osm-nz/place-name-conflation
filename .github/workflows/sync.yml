@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  changelog:
+  sync:
     runs-on: ubuntu-latest
 
     strategy:
@@ -30,6 +30,7 @@ jobs:
       - name: ⏬ Install
         run: |
           yarn
+          touch .env.local
 
       - name: 🚚 Run the conflation
         run: |

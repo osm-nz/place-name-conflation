@@ -1,6 +1,6 @@
 import { StrictMode, useEffect, useState } from 'react';
 import { Alert, CircularProgress, CssBaseline } from '@mui/material';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { HashRouter, Route, Routes } from 'react-router-dom';
 import type { Output } from './types';
 import { DataContext } from './context';
 import { Navbar } from './components/Navbar';
@@ -37,7 +37,7 @@ export const App: React.FC = () => {
 
   return (
     <StrictMode>
-      <BrowserRouter>
+      <HashRouter>
         <DataContext.Provider value={data}>
           <CssBaseline />
           <Navbar />
@@ -50,7 +50,7 @@ export const App: React.FC = () => {
             </Routes>
           </main>
         </DataContext.Provider>
-      </BrowserRouter>
+      </HashRouter>
     </StrictMode>
   );
 };
