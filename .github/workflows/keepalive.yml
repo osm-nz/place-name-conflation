@@ -1,0 +1,15 @@
+name: keepalive
+
+on:
+  schedule:
+    - cron: '8 8 8 * *' # monthly on the 8th
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: k-yle/keepalive@v1

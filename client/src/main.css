@@ -1,0 +1,104 @@
+body {
+  font-family: sans-serif;
+}
+code {
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.2rem;
+  background: #f2f2f2;
+  font-size: 87.5%;
+}
+code a {
+  text-decoration: none;
+  color: #e83e8c;
+}
+code a:hover {
+  text-decoration: underline;
+}
+
+time[title] {
+  text-decoration: underline dotted;
+  cursor: help;
+}
+
+table.layers {
+  & > thead td {
+    font-weight: 400;
+  }
+  & > tbody tr:nth-child(odd) {
+    background-color: #f2f2f2;
+  }
+}
+
+.summary {
+  max-width: 300px;
+}
+
+/* progress bar */
+.progress-bar {
+  display: flex;
+  border-radius: 8px;
+  overflow: hidden;
+  min-width: 300px;
+  height: 26px;
+}
+.progress-bar > div {
+  padding: 4px 0;
+  text-align: center;
+}
+.progress-bar > div:nth-child(1) {
+  background: #2dc937;
+  color: white;
+}
+.progress-bar > div:nth-child(2) {
+  background: #e7b416;
+  color: white;
+}
+.progress-bar > div:nth-child(3) {
+  background: #cc3232;
+  color: white;
+}
+
+.red {
+  color: #cc3232;
+}
+.yellow {
+  color: #e7b416;
+}
+
+.flex {
+  display: flex;
+}
+
+.big-number {
+  display: flex;
+  align-items: center;
+  margin: 16px;
+  padding: 8px;
+  padding-top: 0;
+  height: 70px;
+  width: fit-content;
+  & > main {
+    font-size: 48px;
+    font-family: monospace;
+  }
+
+  & > aside {
+    margin-left: 4px;
+    display: flex;
+    flex-direction: column;
+    font-size: 12px;
+    font-style: italic;
+    & > span {
+      line-height: 20px;
+      font-size: 24px;
+      font-style: normal;
+    }
+  }
+}
+
+.over-map {
+  position: fixed;
+  right: 32px;
+  top: 80px;
+  z-index: 1000;
+}

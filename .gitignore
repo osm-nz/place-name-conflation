@@ -1,4 +1,7 @@
 node_modules
 tmp
 out
+dist
 coverage
+.yarn/*
+.env.local

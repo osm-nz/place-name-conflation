@@ -1,0 +1,38 @@
+name: Weekly Sync
+
+on:
+  schedule:
+    - cron: '6 18 * * 4'
+    # at 06:06am on Thursday NZST
+  workflow_dispatch:
+
+jobs:
+  changelog:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - name: ⏬ Checkout code
+        uses: actions/checkout@v3
+
+      - name: ⏬ Enable Corepack
+        run: corepack enable
+
+      - name: 🔢 Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: yarn
+
+      - name: ⏬ Install
+        run: |
+          yarn
+
+      - name: 🚚 Run the conflation
+        run: |
+          yarn start
+        env:
+          AZ_CON: ${{ secrets.AZ_CON }}

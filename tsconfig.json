@@ -2,11 +2,14 @@
   "compilerOptions": {
     "esModuleInterop": true,
     "strict": true,
+    "noUncheckedIndexedAccess": true,
     "noEmit": true,
     "skipLibCheck": true,
     "downlevelIteration": true,
-    "lib": ["es2022", "dom"], // dom is to hack around https://github.com/DefinitelyTyped/DefinitelyTyped/issues/60924
-    "jsx": "react-jsx"
+    "moduleResolution": "nodenext",
+    "resolveJsonModule": true,
+    "module": "nodenext",
+    "lib": ["esnext"]
   },
   "include": ["src"]
 }
