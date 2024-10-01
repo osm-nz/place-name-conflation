@@ -11,7 +11,14 @@ const _NZGB_NAME_TYPES = {
       'seamark:sea_area:category': 'abyssal_plain',
     },
   },
-  'Amenity Area': __SKIP, // only 16 and they're random spots in the bush
+  'Amenity Area': {
+    tags: {
+      boundary: 'protected_area',
+      protection_title: 'Amenity Area',
+      'protection_title:wikidata': 'Q112160795',
+      protect_class: '7',
+    },
+  },
   Appellation: __SKIP, // colonial-era survey districts or land blocks
   Area: { tags: { place: 'locality' } },
   Bank: {
@@ -89,7 +96,14 @@ const _NZGB_NAME_TYPES = {
     // so we can't use that tag anymore...
     tags: { natural: 'sand' },
   },
-  'Ecological Area': __SKIP, // reconsider after future DOC import
+  'Ecological Area': {
+    tags: {
+      boundary: 'protected_area',
+      protection_title: 'Ecological Area',
+      'protection_title:wikidata': 'Q112136526',
+      protect_class: '1a',
+    },
+  },
   Escarpment: {
     tags: {
       'seamark:type': 'sea_area',
@@ -211,10 +225,29 @@ const _NZGB_NAME_TYPES = {
   },
   'Mud Volcano': { tags: { natural: 'volcano' } },
   'National Park': {
-    tags: { boundary: 'protected_area', protect_class: '2' },
-    acceptTags: [{ boundary: 'national_park' }],
+    tags: {
+      boundary: 'protected_area',
+      protect_class: '2',
+      protection_title: 'National Park',
+      'protection_title:wikidata': 'Q46169',
+    },
+    acceptTags: [
+      {
+        boundary: 'national_park',
+        protect_class: '2',
+        protection_title: 'National Park',
+        'protection_title:wikidata': 'Q46169',
+      },
+    ],
   },
-  'Nature Reserve': __SKIP, // reconsider after future DOC import
+  'Nature Reserve': {
+    tags: {
+      boundary: 'protected_area',
+      protection_title: 'Nature Reserve',
+      'protection_title:wikidata': 'Q113561028',
+      protect_class: '1a',
+    },
+  },
   Pass: { tags: { natural: 'saddle' } }, // mountain pass / saddle
   Peak: {
     tags: {
@@ -260,7 +293,7 @@ const _NZGB_NAME_TYPES = {
     tags: { railway: 'station' },
     acceptTags: [{ railway: 'halt' }],
   },
-  'Ramsar Wetland': { tags: { natural: 'wetland' } },
+  'Ramsar Wetland': { tags: { natural: 'wetland', ramsar: 'yes' } },
   Range: { tags: { natural: 'ridge' }, skipAntarctica: true },
   Rapid: {
     tags: { natural: 'water', water: 'rapids' },
@@ -313,7 +346,14 @@ const _NZGB_NAME_TYPES = {
       'seamark:sea_area:category': 'saddle',
     },
   },
-  'Sanctuary Area': __SKIP, // reconsider after future DOC import
+  'Sanctuary Area': {
+    tags: {
+      boundary: 'protected_area',
+      protection_title: 'Sanctuary Area',
+      'protection_title:wikidata': 'Q112136448',
+      protect_class: '1a',
+    },
+  },
   Scarp: {
     tags: {
       'seamark:type': 'sea_area',
@@ -471,8 +511,22 @@ const _NZGB_NAME_TYPES = {
     acceptTags: [{ water: 'rapids' }],
   }, // or lava-waterfall
   Wetland: { tags: { natural: 'wetland' } },
-  'Wilderness Area': __SKIP, // reconsider after future DOC import
-  'Wildlife Management Area': __SKIP, // reconsider after future DOC import
+  'Wilderness Area': {
+    tags: {
+      boundary: 'protected_area',
+      protection_title: 'Wilderness Area',
+      'protection_title:wikidata': 'Q2445527',
+      protect_class: '1b',
+    },
+  },
+  'Wildlife Management Area': {
+    tags: {
+      boundary: 'protected_area',
+      protection_title: 'Wildlife Management Area',
+      'protection_title:wikidata': 'Q8001309',
+      protect_class: '4',
+    },
+  },
 } satisfies TypeMap;
 
 export const DONT_TRY_TO_MOVE = new Set<NameType>([
