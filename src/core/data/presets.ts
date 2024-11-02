@@ -75,7 +75,14 @@ const _NZGB_NAME_TYPES = {
     ],
   },
   'Coast Feature': { tags: { place: 'locality' } },
-  'Conservation Park': __SKIP, // reconsider after future DOC import
+  'Conservation Park': {
+    tags: {
+      boundary: 'protected_area',
+      protection_title: 'Conservation Park',
+      'protection_title:wikidata': 'Q5162994',
+      protect_class: '2',
+    },
+  },
   Crater: {
     tags: { natural: 'crater' },
     acceptTags: [
@@ -142,7 +149,22 @@ const _NZGB_NAME_TYPES = {
     },
   },
   Glacier: { tags: { natural: 'glacier' }, skipAntarctica: true },
-  'Government Purpose Reserve': __SKIP, // reconsider after future DOC import
+  'Government Purpose Reserve': {
+    tags: {
+      boundary: 'protected_area',
+      protection_title: 'Government Purpose Reserve',
+      'protection_title:wikidata': 'Q112136688',
+      protect_class: '4',
+    },
+    acceptTags: [
+      {
+        // a lot of these are actually DOC depots, fire stations, etc.
+        'not:boundary': 'protected_area',
+        protection_title: 'Government Purpose Reserve',
+        'protection_title:wikidata': 'Q112136688',
+      },
+    ],
+  },
   Guyot: {
     tags: {
       'seamark:type': 'sea_area',
@@ -164,7 +186,14 @@ const _NZGB_NAME_TYPES = {
     ],
   },
   'Historic Antarctic': __SKIP, // this category is for nonexistant features
-  'Historic Reserve': __SKIP, // reconsider after future DOC import
+  'Historic Reserve': {
+    tags: {
+      boundary: 'protected_area',
+      protection_title: 'Historic Reserve',
+      'protection_title:wikidata': 'Q112161119',
+      protect_class: '3',
+    },
+  },
   'Historic Site': { tags: { historic: '*' }, addTags: { historic: 'yes' } },
   Hole: {
     tags: {
@@ -215,7 +244,14 @@ const _NZGB_NAME_TYPES = {
   },
   'Marine Reserve': {
     tags: { leisure: 'nature_reserve' },
-    acceptTags: [{ boundary: 'protected_area' }],
+    acceptTags: [
+      {
+        boundary: 'protected_area',
+        protection_title: 'Marine Reserve',
+        'protection_title:wikidata': 'Q1846270',
+        protect_class: '1a',
+      },
+    ],
   },
   Mound: {
     tags: {
@@ -361,7 +397,14 @@ const _NZGB_NAME_TYPES = {
     },
   },
   'Scenic Reserve': __SKIP, // reconsider after future DOC import
-  'Scientific Reserve': __SKIP, // reconsider after future DOC import
+  'Scientific Reserve': {
+    tags: {
+      boundary: 'protected_area',
+      protection_title: 'Scientific Reserve',
+      'protection_title:wikidata': 'Q113561096',
+      protect_class: '1a',
+    },
+  },
   Sea: {
     tags: { place: 'sea' },
     acceptTags: [
