@@ -130,7 +130,11 @@ const LeftSide = memo<{ onSelect(selected: (string | number)[]): void }>(
 );
 LeftSide.displayName = 'LeftSide';
 
-const LazyPopup: React.FC<{ feature: OsmPatchFeature }> = ({ feature }) => {
+const LazyPopup: React.FC<{
+  feature: OsmPatchFeature;
+  lat: number;
+  lng: number;
+}> = ({ feature, lat, lng }) => {
   // @ts-expect-error -- unofficial field
   const nzgbRef: string = feature.__hack__.ref;
   // @ts-expect-error -- unofficial field
@@ -158,7 +162,13 @@ const LazyPopup: React.FC<{ feature: OsmPatchFeature }> = ({ feature }) => {
           {feature.id}
         </Link>
       ) : (
-        <span className="red">Not in OSM</span>
+        <Link
+          href={`https://kyle.kiwi/iD/#map=18/${lat}/${lng}`}
+          target="_blank"
+          rel="noreferrer"
+        >
+          <span className="red">Not in OSM</span>
+        </Link>
       )}
       <pre>
         {Object.entries(feature.properties)
@@ -265,7 +275,7 @@ export const Home: React.FC = () => {
             return (
               <Marker key={feature.id} position={[lat, lng]}>
                 <Popup>
-                  <LazyPopup feature={feature} />
+                  <LazyPopup feature={feature} lat={lat} lng={lng} />
                 </Popup>
               </Marker>
             );
