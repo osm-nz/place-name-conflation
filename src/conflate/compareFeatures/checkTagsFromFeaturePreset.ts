@@ -74,6 +74,15 @@ export function checkTagsFromFeaturePreset(
   function check(presetToCheck: Tags): Tags {
     const tagChanges: Tags = {};
 
+    // if the preset consists of multiple tags, any *any* of the
+    // tags have a lifecycle prefix, then we won't try to add the
+    // other tags from the preset.
+    const hasLifecyclePrefix = Object.entries(presetToCheck).some(
+      ([key, value]) =>
+        cleanedOsmTags[key]?.has(value) && osm.tags[key] !== value,
+    );
+    if (hasLifecyclePrefix) return tagChanges;
+
     for (const [key, value] of Object.entries(presetToCheck)) {
       const osmTagValues = [...(cleanedOsmTags[key] || [])];
       const isTagWrong =

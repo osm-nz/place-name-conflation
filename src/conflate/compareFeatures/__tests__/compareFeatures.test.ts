@@ -363,6 +363,28 @@ describe('compareFeatures', () => {
         ),
       ).toBeUndefined();
     });
+
+    it('suggests adding other preset tags if some are missing', () => {
+      expect(
+        conflateTags(
+          { name: 'A', type: 'Nature Reserve' },
+          { name: 'A', boundary: 'protected_area' },
+        ),
+      ).toStrictEqual({
+        protect_class: '1a',
+        protection_title: 'Nature Reserve',
+        'protection_title:wikidata': 'Q113561028',
+      });
+    });
+
+    it("doesn't suggest adding other preset tags if any of the preset tags have a lifecycle prefix", () => {
+      expect(
+        conflateTags(
+          { name: 'A', type: 'Nature Reserve' },
+          { name: 'A', 'not:boundary': 'protected_area' },
+        ),
+      ).toBeUndefined();
+    });
   });
 
   describe('exceptions', () => {
