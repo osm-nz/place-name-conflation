@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/prevent-abbreviations -- refs is a common OSM term */
 import type { NZGBFeature } from '../core/types/nzgb.def.js';
 import type { WikidataItem } from '../core/types/wikidata.def.js';
 

@@ -1,10 +1,10 @@
 import { promises as fs } from 'node:fs';
-import { project } from '../../taginfo.json' assert { type: 'json' };
+import taginfo from '../../taginfo.json' assert { type: 'json' };
 import { configRawPath } from '../core/constants.js';
 import type { Config } from '../core/types/general.def.js';
 import { parseJsonc } from '../core/jsonc.js';
 
-const url = project.project_url.replace(
+const url = taginfo.project.project_url.replace(
   'github.com',
   'raw.githubusercontent.com/wiki',
 );

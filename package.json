@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "start": "node --import tsx --env-file=.env.local src/main",
-    "lint": "eslint --ext .ts,.tsx,.js --ignore-path .gitignore . && tsc",
+    "lint": "eslint . && tsc",
     "test": "vitest"
   },
   "dependencies": {
@@ -19,24 +19,11 @@
   "devDependencies": {
     "@types/geojson": "^7946.0.14",
     "@types/node": "^20.14.0",
-    "eslint": "^8.56.0",
-    "eslint-config-kyle": "^22.4.0",
+    "eslint": "^9.16.0",
+    "eslint-config-kyle": "^25.0.0",
     "osm-api": "^2.1.1",
     "tsx": "^4.11.2",
     "vitest": "^1.6.0"
-  },
-  "eslintConfig": {
-    "extends": "kyle",
-    "rules": {
-      "camelcase": 0,
-      "no-param-reassign": 0,
-      "@typescript-eslint/no-dynamic-delete": 0
-    },
-    "settings": {
-      "jest": {
-        "version": 29
-      }
-    }
   },
   "prettier": "eslint-config-kyle/prettier",
   "engineStrict": true,

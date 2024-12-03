@@ -146,11 +146,9 @@ export const LayerInfo: React.FC = () => {
                 </td>
                 <td>{type}</td>
                 <td>{stats && formatNumber(total(stats))}</td>
-                {/* eslint-disable-next-line jsx-a11y/control-has-associated-label -- bug with the rule */}
                 <td>
                   <Tags type={type} data={data} />
                 </td>
-                {/* eslint-disable-next-line jsx-a11y/control-has-associated-label -- bug with the rule */}
                 <td>
                   <Tags type={type} data={data} acceptTags />
                 </td>

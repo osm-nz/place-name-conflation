@@ -176,7 +176,6 @@ async function tempToFinal(temp: TempObject, config: Config) {
   return out;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function transformNzgb(_: number, config: Config) {
   console.log('Preprocessing NZGB data...');
   const temp = await csvToTemp();

@@ -52,10 +52,12 @@ export function isUnofficialAndOsmHasMacrons(
   osm: OSMFeature,
   config: Config,
 ) {
+  const ref = osm.tags['ref:linz:place_id']!;
+
   // for official names, an inconsistency is only
   // acceptable if there's an override for this ref.
   const shouldAllowInconsistency = nzgb.official
-    ? osm.tags['ref:linz:place_id']! in config.allowInconsistentDiacritics
+    ? ref in config.allowInconsistentDiacritics
     : true;
 
   return (

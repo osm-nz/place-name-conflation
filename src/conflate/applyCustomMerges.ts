@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/prevent-abbreviations -- refs is a common OSM term */
 import { distanceBetween } from '../core/geo.js';
 import type { TransformedNzgb } from '../core/types/nzgb.def.js';
 import type { TransformedOsm } from '../core/types/osm.def.js';
