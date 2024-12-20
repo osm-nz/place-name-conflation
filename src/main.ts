@@ -1,5 +1,6 @@
 import { promises as fs } from 'node:fs';
-import { tempFolder } from './core/constants.js';
+import { dirname } from 'node:path';
+import { outputFile, tempFolder } from './core/constants.js';
 import { fetchNzgb } from './api/nzgb.js';
 import { fetchOsm } from './api/osm.js';
 import { fetchWikidata } from './api/wikidata.js';
@@ -7,7 +8,6 @@ import { transformWikidata } from './transformer/wikidata.js';
 import { transformOsm } from './transformer/osm.js';
 import { transformNzgb } from './transformer/nzgb.js';
 import { conflate } from './conflate/index.js';
-import { upload } from './upload/upload.js';
 import { fetchConfig } from './api/config.js';
 
 async function main() {
@@ -24,7 +24,8 @@ async function main() {
 
   const result = await conflate({ nzgb, osm, wikidata, config });
 
-  await upload(result);
+  await fs.mkdir(dirname(outputFile), { recursive: true });
+  await fs.writeFile(outputFile, JSON.stringify(result, null, 2));
 }
 
 await main();

@@ -10,16 +10,12 @@ import { Warnings } from './pages/Warnings';
 import './main.css';
 import { LayerInfo } from './pages/LayerInfo';
 
-const BASE_URL = localStorage.dev
-  ? 'http://localhost:3000'
-  : 'https://linz-addr-cdn.kyle.kiwi';
-
 export const App: React.FC = () => {
   const [data, setData] = useState<Output>();
   const [error, setError] = useState<unknown>();
 
   useEffect(() => {
-    fetch(`${BASE_URL}/place-names.osmPatch.geo.json`)
+    fetch('./place-names.osmPatch.geo.json')
       .then((r) => r.json())
       .then(setData)
       .catch(setError);

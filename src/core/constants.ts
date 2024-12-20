@@ -21,5 +21,5 @@ export const configRawPath = path.join(tempFolder, 'raw-config.json');
 
 export const outputFile = path.join(
   tempFolder,
-  'place-names.osmPatch.geo.json',
+  '../client/public/place-names.osmPatch.geo.json',
 );

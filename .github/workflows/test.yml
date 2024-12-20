@@ -35,15 +35,9 @@ jobs:
         run: |
           yarn test
 
+      # this is just to check that it compiles
+      # the result is not deployed from here
       - name: 🛠 Build Client
         run: |
           cd client
           yarn build
-
-      - name: ⚛ Deploy Client
-        if: ${{ github.ref == 'refs/heads/main' }}
-        uses: JamesIves/github-pages-deploy-action@v4.3.0
-        with:
-          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-          BRANCH: gh-pages
-          FOLDER: client/dist
