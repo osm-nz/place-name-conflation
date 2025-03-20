@@ -47,7 +47,7 @@ const _NZGB_NAME_TYPES = {
     addTags: { place: 'locality' },
   },
   Bridge: { tags: { man_made: 'bridge' } },
-  Building: __SKIP, // only 100 features, all already in OSM, and querying for building=yes is a waste of resources
+  Building: { tags: { building: '*' } },
   Bush: { tags: { natural: 'wood' } }, // this is ambigous, in NZ English this could mean forest or shrubland
   Caldera: { tags: { natural: 'caldera' } },
   Canal: { tags: { type: 'waterway', waterway: 'canal' } },
@@ -337,7 +337,14 @@ const _NZGB_NAME_TYPES = {
   },
 
   Recreation: { tags: { place: 'locality' } }, // named places within ski fields
-  'Recreation Reserve': __SKIP, // reconsider after future DOC import
+  'Recreation Reserve': {
+    tags: {
+      boundary: 'protected_area',
+      protection_title: 'Recreation Reserve',
+      'protection_title:wikidata': 'Q112161186',
+      protect_class: '5',
+    },
+  },
   Reef: {
     tags: { natural: 'reef' },
     acceptTags: [
@@ -396,7 +403,14 @@ const _NZGB_NAME_TYPES = {
       'seamark:sea_area:category': 'escarpment',
     },
   },
-  'Scenic Reserve': __SKIP, // reconsider after future DOC import
+  'Scenic Reserve': {
+    tags: {
+      boundary: 'protected_area',
+      protection_title: 'Scenic Reserve',
+      'protection_title:wikidata': 'Q63248569',
+      protect_class: '3',
+    },
+  },
   'Scientific Reserve': {
     tags: {
       boundary: 'protected_area',
