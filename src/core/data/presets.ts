@@ -18,6 +18,13 @@ const _NZGB_NAME_TYPES = {
       'protection_title:wikidata': 'Q112160795',
       protect_class: '7',
     },
+    acceptTags: [
+      {
+        leisure: 'park',
+        protection_title: 'Amenity Area',
+        'protection_title:wikidata': 'Q112160795',
+      },
+    ],
   },
   Appellation: __SKIP, // colonial-era survey districts or land blocks
   Area: { tags: { place: 'locality' } },
@@ -82,6 +89,13 @@ const _NZGB_NAME_TYPES = {
       'protection_title:wikidata': 'Q5162994',
       protect_class: '2',
     },
+    acceptTags: [
+      {
+        leisure: 'park',
+        protection_title: 'Conservation Park',
+        'protection_title:wikidata': 'Q5162994',
+      },
+    ],
   },
   Crater: {
     tags: { natural: 'crater' },
@@ -110,6 +124,13 @@ const _NZGB_NAME_TYPES = {
       'protection_title:wikidata': 'Q112136526',
       protect_class: '1a',
     },
+    acceptTags: [
+      {
+        leisure: 'park',
+        protection_title: 'Ecological Area',
+        'protection_title:wikidata': 'Q112136526',
+      },
+    ],
   },
   Escarpment: {
     tags: {
@@ -158,12 +179,17 @@ const _NZGB_NAME_TYPES = {
     },
     acceptTags: [
       {
+        leisure: 'park',
+        protection_title: 'Government Purpose Reserve',
+        'protection_title:wikidata': 'Q112136688',
+      },
+      {
         // a lot of these are actually DOC depots, fire stations, etc.
         'not:boundary': 'protected_area',
         protection_title: 'Government Purpose Reserve',
         'protection_title:wikidata': 'Q112136688',
       },
-    ],
+    ] as Tags[],
   },
   Guyot: {
     tags: {
@@ -193,6 +219,13 @@ const _NZGB_NAME_TYPES = {
       'protection_title:wikidata': 'Q112161119',
       protect_class: '3',
     },
+    acceptTags: [
+      {
+        leisure: 'park',
+        protection_title: 'Historic Reserve',
+        'protection_title:wikidata': 'Q112161119',
+      },
+    ],
   },
   'Historic Site': { tags: { historic: '*' }, addTags: { historic: 'yes' } },
   Hole: {
@@ -283,6 +316,13 @@ const _NZGB_NAME_TYPES = {
       'protection_title:wikidata': 'Q113561028',
       protect_class: '1a',
     },
+    acceptTags: [
+      {
+        leisure: 'park',
+        protection_title: 'Nature Reserve',
+        'protection_title:wikidata': 'Q113561028',
+      },
+    ],
   },
   Pass: { tags: { natural: 'saddle' } }, // mountain pass / saddle
   Peak: {
@@ -344,6 +384,13 @@ const _NZGB_NAME_TYPES = {
       'protection_title:wikidata': 'Q112161186',
       protect_class: '5',
     },
+    acceptTags: [
+      {
+        leisure: 'park',
+        protection_title: 'Recreation Reserve',
+        'protection_title:wikidata': 'Q112161186',
+      },
+    ],
   },
   Reef: {
     tags: { natural: 'reef' },
@@ -396,6 +443,13 @@ const _NZGB_NAME_TYPES = {
       'protection_title:wikidata': 'Q112136448',
       protect_class: '1a',
     },
+    acceptTags: [
+      {
+        leisure: 'park',
+        protection_title: 'Sanctuary Area',
+        'protection_title:wikidata': 'Q112136448',
+      },
+    ],
   },
   Scarp: {
     tags: {
@@ -410,6 +464,13 @@ const _NZGB_NAME_TYPES = {
       'protection_title:wikidata': 'Q63248569',
       protect_class: '3',
     },
+    acceptTags: [
+      {
+        leisure: 'park',
+        protection_title: 'Scenic Reserve',
+        'protection_title:wikidata': 'Q63248569',
+      },
+    ],
   },
   'Scientific Reserve': {
     tags: {
@@ -418,6 +479,13 @@ const _NZGB_NAME_TYPES = {
       'protection_title:wikidata': 'Q113561096',
       protect_class: '1a',
     },
+    acceptTags: [
+      {
+        leisure: 'park',
+        protection_title: 'Scientific Reserve',
+        'protection_title:wikidata': 'Q113561096',
+      },
+    ],
   },
   Sea: {
     tags: { place: 'sea' },
@@ -575,6 +643,13 @@ const _NZGB_NAME_TYPES = {
       'protection_title:wikidata': 'Q2445527',
       protect_class: '1b',
     },
+    acceptTags: [
+      {
+        leisure: 'park',
+        protection_title: 'Wilderness Area',
+        'protection_title:wikidata': 'Q2445527',
+      },
+    ],
   },
   'Wildlife Management Area': {
     tags: {
@@ -583,6 +658,13 @@ const _NZGB_NAME_TYPES = {
       'protection_title:wikidata': 'Q8001309',
       protect_class: '4',
     },
+    acceptTags: [
+      {
+        leisure: 'park',
+        protection_title: 'Wildlife Management Area',
+        'protection_title:wikidata': 'Q8001309',
+      },
+    ],
   },
 } satisfies TypeMap;
 
