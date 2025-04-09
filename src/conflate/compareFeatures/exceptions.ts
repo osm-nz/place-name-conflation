@@ -1,3 +1,4 @@
+import { NZGB_NAME_TYPES, __SKIP } from '../../core/data/presets.js';
 import type { Config } from '../../core/types/general.def.js';
 import type { NZGBFeature } from '../../core/types/nzgb.def.js';
 import type { OSMFeature } from '../../core/types/osm.def.js';
@@ -111,4 +112,17 @@ export function allowDualNames(nzgb: NZGBFeature, osm: OSMFeature) {
         segment === osm.tags['name:mi'],
     )
   );
+}
+
+/**
+ * If the preset is `x=y`, but the OSM feature has an explicit `not:x=y`
+ * tag, then we'll allow any `name` tag.
+ */
+export function hasNotLifeCycleTag(nzgb: NZGBFeature, osm: OSMFeature) {
+  const preset = NZGB_NAME_TYPES[nzgb.type];
+  if (!preset || preset === __SKIP) return false;
+
+  const presetKeys = 'tags' in preset ? Object.entries(preset.tags) : [];
+
+  return presetKeys.some(([key, value]) => osm.tags[`not:${key}`] === value);
 }

@@ -46,7 +46,7 @@ export async function checkWikidataRedirects(
     const error = byOldQId[entity.id]!;
     warnings[WARNING.NON_REDIRECT_WIKIDATA_ERROR] ||= [];
     warnings[WARNING.NON_REDIRECT_WIKIDATA_ERROR].push(
-      `Expected ${error.expected} on ${error.osmId}`,
+      `Expected ${error.expected} on ${error.osmId}, not ${error.actual}`,
     );
   }
 

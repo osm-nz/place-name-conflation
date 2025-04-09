@@ -17,6 +17,7 @@ import {
   allowDualNames,
   allowSlashInsteadOfOr,
   allowTrivialDifferences,
+  hasNotLifeCycleTag,
   isUnofficialAndOsmHasMacrons,
   nameHasSlashForOldName,
 } from './exceptions.js';
@@ -69,6 +70,7 @@ export function compareFeatures(
       allowSlashInsteadOfOr(nzgb, osm),
       allowTrivialDifferences(nzgb, osm),
       allowDualNames(nzgb, osm),
+      hasNotLifeCycleTag(nzgb, osm),
     ];
     // if every exception is false, then propose changing the name
     if (exceptions.every((x) => !x)) {
@@ -187,11 +189,17 @@ export function compareFeatures(
     }
 
     // wikidata tag is mising
-    tagChanges.wikidata = bestWikidata.qId;
+    if (osm.tags['not:wikidata'] !== bestWikidata.qId) {
+      tagChanges.wikidata = bestWikidata.qId;
+    }
   }
 
   // 11. Add the wikipedia tag if it's missing
-  if (bestWikidata?.wikipedia && !osm.tags.wikipedia) {
+  if (
+    bestWikidata?.wikipedia &&
+    !osm.tags.wikipedia &&
+    !osm.tags['not:wikidata'] // skip if this is a tricky situation
+  ) {
     tagChanges.wikipedia = bestWikidata.wikipedia;
   }
 

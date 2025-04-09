@@ -166,7 +166,7 @@ async function tempToFinal(temp: TempObject, config: Config) {
       };
     }
 
-    let override = config.overrides[ref] || {};
+    let override = config.overrides[ref] ?? {};
     if (typeof override === 'string') override = { name: override };
     Object.assign(out[ref]!, override);
   }

@@ -412,4 +412,16 @@ describe('compareFeatures', () => {
       ),
     ).toBeUndefined();
   });
+
+  it('allows any name if the OSM feature has a not: lifecycle prefix', () => {
+    expect(
+      conflateTags(
+        { name: 'Omanawa Falls' },
+        {
+          name: 'some random name',
+          'not:seamark:type': 'sea_area',
+        },
+      ),
+    ).toBeUndefined();
+  });
 });
