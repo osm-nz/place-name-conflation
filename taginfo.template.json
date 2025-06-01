@@ -58,15 +58,6 @@
       "object_types": ["node", "way", "area", "relation"]
     },
     {
-      "key": "seamark:type",
-      "value": "sea_area",
-      "object_types": ["node", "way", "area", "relation"]
-    },
-    {
-      "key": "seamark:sea_area:category",
-      "object_types": ["node", "way", "area", "relation"]
-    },
-    {
       "key": "type",
       "value": "multilinestring",
       "object_types": ["relation"],

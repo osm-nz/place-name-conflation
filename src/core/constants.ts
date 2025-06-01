@@ -23,3 +23,8 @@ export const outputFile = path.join(
   tempFolder,
   '../client/public/place-names.osmPatch.geo.json',
 );
+
+export const taginfoOutputFile = path.join(
+  tempFolder,
+  '../client/public/taginfo.generated.json',
+);

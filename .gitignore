@@ -4,4 +4,4 @@ out
 dist
 coverage
 .yarn/*
-client/public/*.geo.json
+client/public
