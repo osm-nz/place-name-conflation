@@ -156,7 +156,7 @@ const _NZGB_NAME_TYPES = {
   Flat: { tags: { place: 'locality' } }, // Plateau, table, flat plain
   Ford: { tags: { ford: 'yes' } },
   Forest: { tags: { natural: 'wood' }, acceptTags: [{ landuse: 'forest' }] },
-  Fork: { tags: { junction: 'yes' } },
+  Fork: { tags: { junction: 'yes' }, acceptTags: [{ waterway: 'confluence' }] },
   'Fracture Zone': {
     tags: {
       'seamark:type': 'sea_area',
