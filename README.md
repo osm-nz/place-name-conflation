@@ -1,8 +1,8 @@
 # NZGB ➡️ OSM place name conflation
 
-[![Test](https://github.com/osm-nz/place-name-conflation/actions/workflows/ci.yml/badge.svg)](https://github.com/osm-nz/place-name-conflation/actions/workflows/ci.yml)
+[![Test](https://github.com/osm-nz/place-name-conflation/actions/workflows/test.yml/badge.svg)](https://github.com/osm-nz/place-name-conflation/actions/workflows/test.yml)
 ![](https://github.com/osm-nz/place-name-conflation/workflows/Weekly%20Sync/badge.svg)
-![Lines of code](https://img.shields.io/tokei/lines/github/osm-nz/place-name-conflation?color=green)
+![Lines of code](https://sloc.xyz/github/osm-nz/place-name-conflation)
 
 This repository contains the code that regularly compares place names in [OpenStreetMap](https://openstreetmap.org) with the [New Zealand Geographic Board (Ngā Pou Taunaha o Aotearoa) Gazetteer](https://gazetteer.linz.govt.nz).
 
