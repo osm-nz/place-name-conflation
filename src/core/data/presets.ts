@@ -103,6 +103,7 @@ const _NZGB_NAME_TYPES = {
       { natural: 'volcano' },
       { natural: 'peak' },
       { geological: 'volcanic_caldera_rim' },
+      { natural: 'hot_spring' },
     ] as Tags[],
   },
   Crevasse: { tags: { natural: 'crevasse' } },
@@ -274,6 +275,20 @@ const _NZGB_NAME_TYPES = {
       'seamark:type': 'sea_area',
       'seamark:sea_area:category': 'yes',
     },
+    acceptTags: [
+      {
+        boundary: 'protected_area',
+        protection_title: 'High Protection Area',
+        'protection_title:wikidata': 'Q136796847',
+        protect_class: '6',
+      },
+      {
+        boundary: 'protected_area',
+        protection_title: 'Seafloor Protection Area',
+        'protection_title:wikidata': 'Q136796844',
+        protect_class: '6',
+      },
+    ],
   },
   'Marine Reserve': {
     tags: { leisure: 'nature_reserve' },
@@ -359,7 +374,10 @@ const _NZGB_NAME_TYPES = {
   Pool: { tags: { natural: 'water' }, addTags: { water: 'stream_pool' } },
   Port: { tags: { natural: 'bay' } }, // these are not `industrial=port`
   'Railway Crossing': { tags: { place: 'locality' } }, // only 2 features both are localities
-  'Railway Junction': { tags: { railway: 'yard' } },
+  'Railway Junction': {
+    tags: { railway: 'junction' },
+    acceptTags: [{ railway: 'yard' }],
+  },
   'Railway Line': {
     tags: { type: 'route', route: 'railway' },
     acceptTags: [{ type: 'route', route: 'train' }], // exception for vintage railways
