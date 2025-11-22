@@ -1,6 +1,7 @@
 import type { OsmPatch } from 'osm-api';
 import { CHANGESET_TAGS, USER_AGNET } from '../core/constants.js';
 import { WARNING, type Warnings } from '../core/types/output.def.js';
+import { OSM_TYPES } from '../core/types/osm.def.js';
 import { wikidataErrors } from './compareFeatures/compareFeatures.js';
 
 type WikidataApiResponse = {
@@ -9,6 +10,12 @@ type WikidataApiResponse = {
     redirects?: { from: string; to: string };
   };
 };
+
+export const osmIdToLink = (osmId: string) =>
+  `<a href='https://osm.org/${OSM_TYPES[osmId[0]!]}/${osmId.slice(1)}' target='_blank'>${osmId}</a>`;
+
+export const qIdToLink = (qId: string) =>
+  `<a href='https://wikidata.org/wiki/${qId}' target='_blank'>${qId}</a>`;
 
 export async function checkWikidataRedirects(
   warnings: Warnings,
@@ -46,7 +53,7 @@ export async function checkWikidataRedirects(
     const error = byOldQId[entity.id]!;
     warnings[WARNING.NON_REDIRECT_WIKIDATA_ERROR] ||= [];
     warnings[WARNING.NON_REDIRECT_WIKIDATA_ERROR].push(
-      `Expected ${error.expected} on ${error.osmId}, not ${error.actual}`,
+      `Expected ${qIdToLink(error.expected)} on ${osmIdToLink(error.osmId)}, not ${qIdToLink(error.actual)}`,
     );
   }
 

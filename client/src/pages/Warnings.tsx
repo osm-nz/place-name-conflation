@@ -21,7 +21,13 @@ export const Warnings: React.FC = () => {
             <Typography variant="h5">{label}</Typography>
             <ul>
               {warnings[key as never as WARNING]?.map((warning) => {
-                return <li key={warning}>{warning}</li>;
+                return (
+                  <li
+                    key={warning}
+                    // eslint-disable-next-line react/no-danger -- safe bc the warnings don't contain user-data
+                    dangerouslySetInnerHTML={{ __html: warning }}
+                  />
+                );
               })}
             </ul>
           </div>

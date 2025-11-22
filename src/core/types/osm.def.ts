@@ -1,5 +1,11 @@
-import type { OsmFeature, Tags } from 'osm-api';
+import type { OsmFeature, OsmFeatureType, Tags } from 'osm-api';
 import type { LifeCyclePrefix } from '../../conflate/compareFeatures/checkTagsFromFeaturePreset.js';
+
+export const OSM_TYPES: Record<string, OsmFeatureType> = {
+  n: 'node',
+  w: 'way',
+  r: 'relation',
+};
 
 declare global {
   namespace OsmApi {
