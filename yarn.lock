@@ -4565,13 +4565,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"osm-api@npm:^2.1.1":
-  version: 2.3.0
-  resolution: "osm-api@npm:2.3.0"
+"osm-api@npm:^3.3.1":
+  version: 3.3.1
+  resolution: "osm-api@npm:3.3.1"
   dependencies:
     "@types/geojson": "npm:^7946.0.13"
     fast-xml-parser: "npm:^4.4.1"
-  checksum: 10c0/1e80cf15b96c1b9da426dfa489422ea3172108e7f97017e5e4ddf716096f5fee54e1350f7b5416c87bfbd4e13ead57abbd2b53df3862f17076ac8203146d4f05
+  checksum: 10c0/bdc7cda1f4b018d4e8ea5a938653e0bfe823507f6b284e521fa462e7c30212f852a8731161fbecdc4fa4708d84355540e88bf3dd5b246245247c657060e0df85
   languageName: node
   linkType: hard
 
@@ -4757,7 +4757,7 @@ __metadata:
     csv-parser: "npm:^3.0.0"
     eslint: "npm:^9.16.0"
     eslint-config-kyle: "npm:^25.0.0"
-    osm-api: "npm:^2.1.1"
+    osm-api: "npm:^3.3.1"
     tsx: "npm:^4.11.2"
     typescript: "npm:^5.4.5"
     vitest: "npm:^1.6.0"

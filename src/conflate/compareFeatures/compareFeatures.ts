@@ -1,7 +1,7 @@
 import assert from 'node:assert';
 import type { Feature, Geometry } from 'geojson';
 
-import type { Tags } from 'osm-api';
+import type { OsmPatchFeature, Tags } from 'osm-api';
 import type { NZGBFeature } from '../../core/types/nzgb.def.js';
 import type { OSMFeature } from '../../core/types/osm.def.js';
 import {
@@ -43,6 +43,10 @@ export type WikidataErrors = {
 };
 export const wikidataErrors: WikidataErrors[] = [];
 
+type TagsWithAction = Tags & {
+  __action: OsmPatchFeature['properties']['__action'];
+};
+
 /** compares the OSM place with the NZGB place and returns a list of issues */
 export function compareFeatures(
   ref: string,
@@ -50,8 +54,8 @@ export function compareFeatures(
   osm: OSMFeature,
   bestWikidata: WikidataItem | undefined,
   config: Config,
-): Feature<Geometry, Tags> | undefined {
-  const tagChanges: Tags = { __action: 'edit' };
+): Feature<Geometry, TagsWithAction> | undefined {
+  const tagChanges: TagsWithAction = { __action: 'edit' };
 
   const osmCenter =
     'lat' in osm && 'lon' in osm

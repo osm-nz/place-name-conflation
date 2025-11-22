@@ -1,3 +1,5 @@
+import type { Tags } from 'osm-api';
+
 /** Use this for features that should be skipped (e.g. roads) */
 export const __SKIP = Symbol('Skip');
 
@@ -698,7 +700,6 @@ export const NZGB_NAME_TYPES: TypeMap = _NZGB_NAME_TYPES;
 
 export type NameType = keyof typeof _NZGB_NAME_TYPES;
 
-type Tags = { [key: string]: string };
 type TypeMap = Record<
   string,
   | typeof __SKIP

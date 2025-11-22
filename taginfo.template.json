@@ -58,6 +58,11 @@
       "object_types": ["node", "way", "area", "relation"]
     },
     {
+      "key": "not:wikidata",
+      "object_types": ["node", "way", "area", "relation"],
+      "description": "This tag can be used to override or disable automatic conflation of the wikidata tag."
+    },
+    {
       "key": "type",
       "value": "multilinestring",
       "object_types": ["relation"],

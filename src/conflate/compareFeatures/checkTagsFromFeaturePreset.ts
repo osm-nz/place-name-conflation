@@ -1,10 +1,10 @@
-import type { Tags } from 'osm-api';
+import type { Key, Tags } from 'osm-api';
 import { getPresetTags } from '../getPresetTags.js';
 import type { NZGBFeature } from '../../core/types/nzgb.def.js';
 import type { OSMFeature } from '../../core/types/osm.def.js';
 
 // from https://github.com/openstreetmap/iD/blame/5f1360e/modules/osm/tags.js#L11-L24
-const LIFECYCLE_PREFIXES = new Set([
+const LIFECYCLE_PREFIXES = new Set(<const>[
   'proposed',
   'planned',
   'construction',
@@ -20,14 +20,16 @@ const LIFECYCLE_PREFIXES = new Set([
   'intermittent',
   'not',
 ]);
+export type LifeCyclePrefix =
+  typeof LIFECYCLE_PREFIXES extends Set<infer T> ? T : never;
 
 // from https://github.com/openstreetmap/iD/blame/5f1360e/modules/osm/tags.js#L27
-function osmRemoveLifecyclePrefix(key: string) {
+function osmRemoveLifecyclePrefix(key: Key): Key {
   const keySegments = key.split(':');
   if (keySegments.length === 1) return key;
 
-  if (LIFECYCLE_PREFIXES.has(keySegments[0]!)) {
-    return key.slice(keySegments[0]!.length + 1);
+  if (LIFECYCLE_PREFIXES.has(<LifeCyclePrefix>keySegments[0]!)) {
+    return <Key>key.slice(keySegments[0]!.length + 1);
   }
 
   return key;
@@ -44,8 +46,9 @@ function osmRemoveLifecyclePrefix(key: string) {
  * ```
  */
 function stripAllLifecyclePrefixes(tags: Tags) {
-  const out: Record<string, Set<string>> = {};
-  for (const [key, value] of Object.entries(tags)) {
+  const out: Partial<Record<Key, Set<string>>> = {};
+  for (const [_key, value] of Object.entries(tags)) {
+    const key = <Key>_key;
     if (value) {
       const stripedKey = osmRemoveLifecyclePrefix(key);
       out[stripedKey] ||= new Set<string>();
@@ -78,12 +81,15 @@ export function checkTagsFromFeaturePreset(
     // tags have a lifecycle prefix, then we won't try to add the
     // other tags from the preset.
     const hasLifecyclePrefix = Object.entries(presetToCheck).some(
-      ([key, value]) =>
-        cleanedOsmTags[key]?.has(value) && osm.tags[key] !== value,
+      ([_key, value]) => {
+        const key = <Key>_key;
+        return cleanedOsmTags[key]?.has(value!) && osm.tags[key] !== value;
+      },
     );
     if (hasLifecyclePrefix) return tagChanges;
 
-    for (const [key, value] of Object.entries(presetToCheck)) {
+    for (const [_key, value] of Object.entries(presetToCheck)) {
+      const key = <Key>_key;
       const osmTagValues = [...(cleanedOsmTags[key] || [])];
       const isTagWrong =
         !osmTagValues.length ||
