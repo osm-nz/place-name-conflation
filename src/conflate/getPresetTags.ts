@@ -9,7 +9,7 @@ export function getPresetTags(place: NZGBFeature): {
   acceptTags?: Tags[];
 } {
   const preset = NZGB_NAME_TYPES[place.type];
-  assert(preset && preset !== __SKIP); // impossible
+  assert.ok(preset && preset !== __SKIP); // impossible
 
   if ('tags' in preset) {
     return {

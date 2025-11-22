@@ -1,5 +1,5 @@
 import { promises as fs } from 'node:fs';
-import taginfo from '../../taginfo.template.json' assert { type: 'json' };
+import taginfo from '../../taginfo.template.json' with { type: 'json' };
 import { configRawPath } from '../core/constants.js';
 import type { Config } from '../core/types/general.def.js';
 import { parseJsonc } from '../core/jsonc.js';

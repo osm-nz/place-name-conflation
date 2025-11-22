@@ -94,7 +94,7 @@ async function tempToFinal(temp: TempObject, config: Config) {
 
     const officialNames = place.names
       .filter((x) => x.status === 'O')
-      .sort((a, b) => +b.teReo - +a.teReo);
+      .toSorted((a, b) => +b.teReo - +a.teReo);
 
     let ref: Ref;
 
@@ -113,7 +113,7 @@ async function tempToFinal(temp: TempObject, config: Config) {
       // this feature has one or more official names
       ref = officialNames
         .map((n) => n.ref)
-        .sort((a, b) => b - a) // sort so that the newest ref comes first
+        .toSorted((a, b) => b - a) // sort so that the newest ref comes first
         .join(';') as Ref;
 
       if (officialNames.length > 2) {
@@ -136,7 +136,7 @@ async function tempToFinal(temp: TempObject, config: Config) {
       // this feature has no official names
       const names = place.names
         .filter((x) => x.status === 'U')
-        .sort((a, b) => +b.teReo - +a.teReo);
+        .toSorted((a, b) => +b.teReo - +a.teReo);
 
       if (!names.length) {
         // skip broken entries
@@ -145,7 +145,7 @@ async function tempToFinal(temp: TempObject, config: Config) {
 
       ref = names
         .map((n) => n.ref)
-        .sort((a, b) => b - a) // sort so that the newest ref comes first
+        .toSorted((a, b) => b - a) // sort so that the newest ref comes first
         .join(';') as Ref;
 
       const name = names.map((n) => n.name).join(' / ');

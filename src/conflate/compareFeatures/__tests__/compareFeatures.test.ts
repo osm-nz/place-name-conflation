@@ -38,7 +38,7 @@ function conflateTags(
   return result.properties;
 }
 
-describe('compareFeatures', () => {
+describe(compareFeatures, () => {
   it('suggests fixing names', () => {
     expect(
       conflateTags({ name: 'correct name' }, { name: 'wrong name' }),

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { checkSubNameForMissingMacrons } from '../subnames.js';
 
-describe('checkSubNameForMissingMacrons', () => {
+describe(checkSubNameForMissingMacrons, () => {
   it.each`
     osmSubName        | nzgb               | output
     ${'Ōtāhuhu'}      | ${'Ōtāhuhu River'} | ${undefined /* expected 2, got 2 */}

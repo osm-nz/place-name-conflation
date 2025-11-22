@@ -60,7 +60,7 @@ const Tags: React.FC<{
   if (acceptTags) {
     return object.acceptTags?.flatMap((tags, index) => [
       index ? ' or ' : '',
-      // eslint-disable-next-line react/no-array-index-key
+      // eslint-disable-next-line @eslint-react/no-array-index-key
       <RenderKV key={index} tags={tags} renderBraces />,
     ]);
   }
@@ -93,11 +93,12 @@ export const getAllStats = (data: Output) => {
 export const LayerInfo: React.FC = () => {
   const data = useContext(DataContext);
 
-  const sorted = Object.entries(data.stats).sort(
+  const sorted = Object.entries(data.stats).toSorted(
     ([, a], [, b]) => (b ? total(b) : 0) - (a ? total(a) : 0),
   );
 
   // generate summary of totals
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const allStats = useMemo(() => getAllStats(data), [data]);
 
   // generate summary of layers

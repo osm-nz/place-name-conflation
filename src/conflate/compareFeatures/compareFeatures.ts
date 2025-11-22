@@ -64,8 +64,8 @@ export function compareFeatures(
       : osm.center;
 
   const preset = NZGB_NAME_TYPES[nzgb.type];
-  assert(preset && preset !== __SKIP);
-  assert(osm.tags);
+  assert.ok(preset && preset !== __SKIP);
+  assert.ok(osm.tags);
 
   // 1a. Check `name`
   if (!preset.chillMode && osm.tags.name !== nzgb.name) {

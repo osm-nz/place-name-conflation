@@ -23,7 +23,7 @@ export function findBestWikidata(
   wikidataItems: WikidataItem[],
 ) {
   /** lowest first */
-  const sortedItems = wikidataItems.sort(
+  const sortedItems = wikidataItems.toSorted(
     (a, b) => +a.qId.slice(1) - +b.qId.slice(1),
   );
 

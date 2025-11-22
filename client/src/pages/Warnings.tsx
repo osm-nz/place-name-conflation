@@ -24,7 +24,7 @@ export const Warnings: React.FC = () => {
                 return (
                   <li
                     key={warning}
-                    // eslint-disable-next-line react/no-danger -- safe bc the warnings don't contain user-data
+                    // eslint-disable-next-line @eslint-react/dom/no-dangerously-set-innerhtml -- safe bc the warnings don't contain user-data
                     dangerouslySetInnerHTML={{ __html: warning }}
                   />
                 );
