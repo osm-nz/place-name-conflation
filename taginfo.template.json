@@ -22,6 +22,10 @@
       "object_types": ["node", "way", "area", "relation"]
     },
     {
+      "key": "name:en",
+      "object_types": ["node", "way", "area", "relation"]
+    },
+    {
       "key": "name:mi",
       "object_types": ["node", "way", "area", "relation"]
     },

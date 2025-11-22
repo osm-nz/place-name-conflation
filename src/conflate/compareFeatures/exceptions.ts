@@ -77,7 +77,7 @@ export function allowSlashInsteadOfOr(nzgb: NZGBFeature, osm: OSMFeature) {
 }
 
 /** @internal */
-function normaliseTrivialNameDifferences(name: string) {
+export function normaliseTrivialNameDifferences(name: string) {
   return name
     .replace(/ Government Purpose/, '')
     .replace(/\bMount\b/, 'Mt')

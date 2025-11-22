@@ -21,6 +21,7 @@ import {
   isUnofficialAndOsmHasMacrons,
   nameHasSlashForOldName,
 } from './exceptions.js';
+import { checkNameEn, checkNameMi } from './subnames.js';
 
 // in metres
 const DISTANCE_APART_THRESHOLD_NODE = 2500;
@@ -206,6 +207,15 @@ export function compareFeatures(
   ) {
     tagChanges.wikipedia = bestWikidata.wikipedia;
   }
+
+  // 12. Check `name:mi` for common issues (see function for more details)
+  const nameMiDiff =
+    osm.tags['name:mi'] && checkNameMi(nzgb.name, osm.tags['name:mi']);
+  if (nameMiDiff) tagChanges['name:mi'] = nameMiDiff;
+
+  // 13. Check `name:en` for common issues (see function for more details)
+  const nameEnDiff = osm.tags['name:en'] && checkNameEn(nzgb.name, osm.tags);
+  if (nameEnDiff) tagChanges['name:en'] = nameEnDiff;
 
   //
   // END OF CHECKS

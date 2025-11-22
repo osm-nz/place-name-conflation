@@ -424,4 +424,14 @@ describe('compareFeatures', () => {
       ),
     ).toBeUndefined();
   });
+
+  it('suggests changing name:mi if it has inconsistent macrons with a sub-portional of the NZGB name', () => {
+    // for more detailed test cases, see the sub function.
+    expect(
+      conflateTags(
+        { name: 'Pūkeko Peak' },
+        { name: 'Pūkeko Peak', 'name:mi': 'Pukeko Maunga' },
+      ),
+    ).toStrictEqual({ 'name:mi': 'Pūkeko Maunga' });
+  });
 });
