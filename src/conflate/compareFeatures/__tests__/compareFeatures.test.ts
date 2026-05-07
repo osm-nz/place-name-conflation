@@ -85,22 +85,10 @@ describe(compareFeatures, () => {
     ).toBeUndefined();
   });
 
-  it('allows the OSM feature to have more macrons if the NZGB has no official name', () => {
+  it('does not allows the OSM feature to have a different number of macrons if the NZGB has macrons', () => {
     expect(
       conflateTags(
         { name: 'Ōtuwharekai', official: undefined },
-        { name: 'Ōtūwharekai' },
-      ),
-    ).toBeUndefined();
-  });
-
-  it('does not apply the above exception for features that have an official name', () => {
-    expect(
-      conflateTags({ name: 'Puhoi', official: true }, { name: 'Pūhoi' }),
-    ).toStrictEqual({ name: 'Puhoi' });
-    expect(
-      conflateTags(
-        { name: 'Ōtuwharekai', official: true },
         { name: 'Ōtūwharekai' },
       ),
     ).toStrictEqual({ name: 'Ōtuwharekai' });

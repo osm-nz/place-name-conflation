@@ -45,7 +45,7 @@ function isPrettyMuchEqual(nzgbName: string, osmName: string) {
 }
 
 /**
- * Special case to allow OSM to have macrons, if the NZGB name is unofficial.
+ * Special case to allow OSM to have macrons, if the NZGB name has no macrons.
  * @returns true if this is an exception and we shouldn't change the name
  */
 export function isUnofficialAndOsmHasMacrons(
@@ -55,11 +55,11 @@ export function isUnofficialAndOsmHasMacrons(
 ) {
   const ref = osm.tags['ref:linz:place_id']!;
 
-  // for official names, an inconsistency is only
-  // acceptable if there's an override for this ref.
-  const shouldAllowInconsistency = nzgb.official
-    ? ref in config.allowInconsistentDiacritics
-    : true;
+  const nzgbHasMacrons = /\p{Dia}/gu.test(nzgb.name.normalize('NFD'));
+  const shouldAllowInconsistency =
+    ref in config.allowInconsistentDiacritics ||
+    !nzgbHasMacrons ||
+    nzgb.type === 'Historic Site'; // for pā
 
   return (
     shouldAllowInconsistency &&
