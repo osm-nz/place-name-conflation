@@ -1,4 +1,5 @@
 import type { Tags } from 'osm-api';
+import type * as Taginfo from 'taginfo-projects';
 import taginfoTemplate from '../../taginfo.template.json' with { type: 'json' };
 import {
   NZGB_NAME_TYPES,
@@ -10,7 +11,7 @@ import {
 const andFormatter = new Intl.ListFormat('en-419', { type: 'conjunction' });
 
 export function generateTaginfoFile() {
-  const output = structuredClone(taginfoTemplate);
+  const output = structuredClone(taginfoTemplate as Taginfo.Schema);
 
   const tagToFeature: { [kv: string]: Set<NameType> } = {};
 

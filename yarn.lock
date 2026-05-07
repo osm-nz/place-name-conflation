@@ -2057,6 +2057,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/taginfo-projects@github:taginfo/taginfo-projects#6daafd2e30a86a8bfb9615855af2c2d73bd98279":
+  version: 0.0.0
+  resolution: "@types/taginfo-projects@https://github.com/taginfo/taginfo-projects.git#commit=6daafd2e30a86a8bfb9615855af2c2d73bd98279"
+  checksum: 10c0/074caa003cc2833e51cf0ada0286e96dce0779a804966af63922db2d8a3182837813f40e1adb3a32ba9dd0a3eaba7ec4f880f3c73ec6e99e7098130d0c3a22fd
+  languageName: node
+  linkType: hard
+
 "@typescript-eslint/eslint-plugin@npm:8.47.0":
   version: 8.47.0
   resolution: "@typescript-eslint/eslint-plugin@npm:8.47.0"
@@ -5410,6 +5417,7 @@ __metadata:
   dependencies:
     "@types/geojson": "npm:^7946.0.16"
     "@types/node": "npm:^24.10.1"
+    "@types/taginfo-projects": "github:taginfo/taginfo-projects#6daafd2e30a86a8bfb9615855af2c2d73bd98279"
     csv-parser: "npm:^3.2.0"
     eslint: "npm:^9.39.1"
     eslint-config-kyle: "npm:^27.0.0"
