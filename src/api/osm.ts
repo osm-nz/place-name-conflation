@@ -22,6 +22,9 @@ export async function fetchOsm() {
     `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`,
     { headers: { 'User-Agent': taginfo.project.project_url } },
   );
+  if (request.status !== 200) {
+    throw new Error(`HTTP ${request.status}: ${request.statusText}`);
+  }
   const apiResponse = (await request.json()) as RawOsm;
 
   await fs.writeFile(osmRawPath, JSON.stringify(apiResponse, null, 2));
