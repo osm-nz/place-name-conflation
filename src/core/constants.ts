@@ -19,9 +19,14 @@ export const osmRawPath = path.join(tempFolder, 'raw-osm.json');
 export const wikidataRawPath = path.join(tempFolder, 'raw-wikidata.json');
 export const configRawPath = path.join(tempFolder, 'raw-config.json');
 
+export const outputFileName = 'place-names.osmPatch.geo.json';
 export const outputFile = path.join(
   tempFolder,
-  '../client/public/place-names.osmPatch.geo.json',
+  `../client/public/${outputFileName}`,
+);
+export const statsOutputFile = path.join(
+  tempFolder,
+  '../client/public/stats.json',
 );
 
 export const taginfoOutputFile = path.join(

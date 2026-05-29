@@ -2,6 +2,7 @@
   "name": "place-name-conflation",
   "private": true,
   "type": "module",
+  "homepage": "https://osm-nz.github.io/place-name-conflation",
   "packageManager": "yarn@4.2.1",
   "workspaces": [
     "client"
