@@ -1,7 +1,7 @@
 node_modules
 tmp
-out
+output
+.DS_Store
 dist
 coverage
 .yarn/*
-client/public

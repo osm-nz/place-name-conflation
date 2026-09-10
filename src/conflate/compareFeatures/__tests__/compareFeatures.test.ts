@@ -14,9 +14,8 @@ function conflateTags(
   wikidata?: Partial<WikidataItem>,
 ) {
   const feature: Partial<OSMFeature> = {
-    type: 'node',
-    id: 1,
-    center: { lat: 0, lon: 0 },
+    id: 'n1',
+    centroid: [0, 0],
     tags: {
       'ref:linz:place_id': '26242',
       'seamark:type': 'sea_area',

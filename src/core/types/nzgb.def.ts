@@ -1,3 +1,4 @@
+import type { Feature, Point } from 'geojson';
 import type { NameType } from '../data/presets.js';
 
 export type RawNzgb = {
@@ -53,17 +54,20 @@ export type RawNzgb = {
 };
 
 export type NZGBFeature = {
+  ref: string;
   lat: number;
   lng: number;
   type: NameType;
   name: string;
   official?: true;
+  discontinued?: true;
   altNames?: string[];
   oldNames?: string[];
   oldRefs?: number[];
   isArea: boolean;
   isUndersea: boolean;
 };
+export type NZGBFeatureGeoJson = Feature<Point, NZGBFeature>;
 export type TransformedNzgb = {
   [placeId: string]: NZGBFeature;
 };

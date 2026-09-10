@@ -4,7 +4,7 @@ import type { NZGBFeature } from '../../core/types/nzgb.def.js';
 import type { OSMFeature } from '../../core/types/osm.def.js';
 
 // from https://github.com/openstreetmap/iD/blame/5f1360e/modules/osm/tags.js#L11-L24
-const LIFECYCLE_PREFIXES = new Set(<const>[
+export const LIFECYCLE_PREFIXES = new Set(<const>[
   'proposed',
   'planned',
   'construction',

@@ -10,26 +10,16 @@ export const CHANGESET_TAGS = {
   created_by: 'LINZ Data Import 2.0.0',
   locale: 'en-NZ',
   source: 'https://wiki.osm.org/LINZ',
+  comment: 'Add/update features based on the NZGB Gazetteer',
 };
 
 export const tempFolder = path.join(import.meta.dirname, '../../tmp');
 
 export const nzgbRawPath = path.join(tempFolder, 'raw-nzgb.csv');
-export const osmRawPath = path.join(tempFolder, 'raw-osm.json');
 export const wikidataRawPath = path.join(tempFolder, 'raw-wikidata.json');
 export const configRawPath = path.join(tempFolder, 'raw-config.json');
 
-export const outputFileName = 'place-names.osmPatch.geo.json';
-export const outputFile = path.join(
-  tempFolder,
-  `../client/public/${outputFileName}`,
-);
-export const statsOutputFile = path.join(
-  tempFolder,
-  '../client/public/stats.json',
-);
-
 export const taginfoOutputFile = path.join(
   tempFolder,
-  '../client/public/taginfo.generated.json',
+  '../output/taginfo.generated.json',
 );

@@ -61,7 +61,7 @@ export function compareFeatures(
   const osmCenter =
     'lat' in osm && 'lon' in osm
       ? (osm as { lat: number; lon: number })
-      : osm.center;
+      : { lat: osm.centroid[1], lon: osm.centroid[0] };
 
   const preset = NZGB_NAME_TYPES[nzgb.type];
   assert.ok(preset && preset !== __SKIP);
@@ -147,9 +147,9 @@ export function compareFeatures(
   const threshold =
     osm.tags['seamark:type'] === 'sea_area' // don't check enourmous undersea areas
       ? Infinity
-      : osm.type === 'node'
+      : osm.id[0] === 'n'
         ? DISTANCE_APART_THRESHOLD_NODE
-        : osm.type === 'way'
+        : osm.id[0] === 'w'
           ? DISTANCE_APART_THRESHOLD_AREA
           : Infinity; // relations are not checked for distance
 
@@ -184,7 +184,7 @@ export function compareFeatures(
       // abort and don't touch the feature if there appears to be duplicate entries in wikidata
       // Fixing this data issue may require editing or merging wikidata items.
       wikidataErrors.push({
-        osmId: `${osm.type[0]}${osm.id}`,
+        osmId: osm.id,
         expected: bestWikidata.qId,
         actual: osm.tags.wikidata,
         lat: nzgb.lat,
@@ -231,7 +231,7 @@ export function compareFeatures(
 
   return {
     type: 'Feature',
-    id: `${osm.type[0]}${osm.id}`,
+    id: osm.id,
     geometry:
       tagChanges.__action === 'move'
         ? {

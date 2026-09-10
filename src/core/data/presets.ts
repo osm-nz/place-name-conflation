@@ -716,6 +716,7 @@ type TypeMap = Record<
       /**
        * if true, we won't try to import or conflate features in
        * Antarctica for this layer.
+       * TODO: review each one
        */
       skipAntarctica?: boolean;
     } & (

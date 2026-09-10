@@ -24,7 +24,7 @@ flowchart LR
 
 # Usage
 
-If you want to help by adding missing place names, visit [✨the dashboard✨](https://osm-nz.github.io/place-name-conflation).
+If you want to help by adding missing place names, visit [✨the dashboard✨](https://osm-nz.github.io/osm-conflation-engine/#/project/ref:linz:place_id).
 
 # Setup
 
@@ -36,12 +36,11 @@ If you want to contribute to the code, the following needs to be done manually:
 4. Run `yarn`
 5. Run `yarn start`
 6. Use the generated [`osmPatch`](https://github.com/osm-nz/linz-address-import/blob/main/SPEC.md) files to update the place names in OSM
-7. Or run the website locally by running `cd client && yarn start`
 
 # The original import
 
 This codebase originally included a lot of complicated logic, which was used to speed up the one-off effort of importing 30,000 place names.
-Now that the initial import is complete, this logic has been removed to simplify and speed up the process, so that it can run automatically every week.
+After the initial import was completed, this logic was removed in June 2024, to simplify and speed up the process, so that it can run automatically every week.
 
 Some of the removed logic includes:
 
@@ -51,3 +50,6 @@ Some of the removed logic includes:
 - A system for importing the geometry of lines/areas that were missing using [the L](https://data.linz.govt.nz/layer/52423)[DS](https://data.linz.govt.nz/layer/52424)
 
 See the [`legacy` tag](https://github.com/osm-nz/place-name-conflation/tree/legacy) for the final version of the codebase which included these features.
+
+This repo also used to have its own standalone website to view the conflation results.
+Nowadays, we use the standardised [osm-conflation-engine](https://github.com/osm-nz/osm-conflation-engine), so all of this bespoke logic was deleted in September 2026.

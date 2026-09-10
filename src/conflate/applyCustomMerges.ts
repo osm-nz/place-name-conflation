@@ -1,6 +1,10 @@
+import type { OsmFeature } from '@osm-conflation-engine/cli';
+import { REF } from '../core/constants.js';
 import { distanceBetween } from '../core/geo.js';
-import type { TransformedNzgb } from '../core/types/nzgb.def.js';
-import type { TransformedOsm } from '../core/types/osm.def.js';
+import type {
+  NZGBFeature,
+  NZGBFeatureGeoJson,
+} from '../core/types/nzgb.def.js';
 import { removeEnglishPrefixesAndSuffixes } from './removeEnglishPrefixesAndSuffixes.js';
 
 /**
@@ -17,132 +21,123 @@ import { removeEnglishPrefixesAndSuffixes } from './removeEnglishPrefixesAndSuff
  * to remove te reo names without detection.
  * In the future we may require wikidata's P2959 before we
  * accept these custom merges.
- *
- * @returns nothing, the `nzgb` argument is mutated (to improve perf)
  */
-export function applyCustomMerges(nzgb: TransformedNzgb, osm: TransformedOsm) {
+export function applyCustomMerges(
+  nzgb: NZGBFeatureGeoJson[],
+  osm: OsmFeature,
+): {
+  merged: NZGBFeatureGeoJson | undefined;
+  warnings: string[];
+} {
   const warnings: string[] = [];
-  let trivialMerges = 0;
 
-  const unexpectedRefsWithSemiColons = new Set<string>();
-  for (const ref in osm) {
-    if (ref.includes(';') && !nzgb[ref]) {
-      unexpectedRefsWithSemiColons.add(ref);
-    }
+  const nzgbByRef = Object.fromEntries(nzgb.map((f) => [f.properties.ref, f]));
+  const osmRefs = osm.tags[REF]?.split(';') || [];
+
+  const nzgbSorted = [
+    ...osmRefs.map((ref) => nzgbByRef[ref]),
+    ...nzgb.filter((f) => !osmRefs.includes(f.properties.ref)),
+  ].filter((x) => !!x);
+
+  const refs = nzgbSorted.map((item) => item.properties.ref);
+  const mergedRef = refs.join(';');
+  const features = nzgbSorted.map((f) => f.properties);
+
+  if (osmRefs.some((ref) => !nzgbByRef[ref])) {
+    warnings.push(`Invalid refs: ${osm.tags[REF]} --> ${mergedRef}`);
+    // in this case, we suggest removing the refs that don't exist
+    // anymore. Most likely cause is that the NZGB has noticed the
+    // duplicates and deleted one of them.
   }
 
-  /**
-   * refs that the previous stage has already merged (usually dual names).
-   */
-  const existingNzgbRefsWithSemiColons: Record<string, string> = {};
-  for (const ref in nzgb) {
-    if (ref.includes(';')) {
-      for (const subRef of ref.split(';')) {
-        existingNzgbRefsWithSemiColons[subRef] = ref;
-      }
-    }
+  // this check applies to all cases - the merged features
+  // have to be reasonably close.
+  const anyAreFarAway = features.some(
+    (f) =>
+      distanceBetween(features[0]!.lat, features[0]!.lng, f.lat, f.lng) >
+      10_000,
+  );
+  if (anyAreFarAway) {
+    // It's possible that the location used to be the same, but
+    // then the NZGB fixed the location on one node. In which case
+    // they should not be merged
+    warnings.push(`Refusing to merge ${refs} since they are too far apart`);
+    return { merged: undefined, warnings };
   }
 
-  for (const mergedRef of unexpectedRefsWithSemiColons) {
-    const refs = mergedRef.split(';');
-    const features = refs.map((ref) => nzgb[ref]!);
+  // a common example is "Mt X" and "X Mountain" coëxisting, so we
+  // strip out prefixes and suffixes per comparing names.
+  const uniqueNames = new Set(
+    features.map((f) => removeEnglishPrefixesAndSuffixes(f.name)),
+  );
 
-    if (features.some((f) => !f)) {
-      const expected = refs.filter((ref) => nzgb[ref]).join(';');
-      if (expected) {
-        warnings.push(`Invalid refs: ${mergedRef} --> ${expected}`);
-        // in this case, we suggest removing the refs that don't exist
-        // anymore. Most likely cause is that the NZGB has noticed the
-        // duplicates and deleted one of them.
-      } else {
-        // none of the refs exist. This is a bit bizare.
-        const possibleOptions = new Set(
-          refs.map((ref) => existingNzgbRefsWithSemiColons[ref] || ''),
-        );
-        possibleOptions.delete('');
+  if (uniqueNames.size === 1) {
+    // all the merged features have the same name. This is the easy case
 
-        warnings.push(
-          `(!) None of these refs exist: ${mergedRef}. Did you mean ${[...possibleOptions].join(' or ')}?`,
-        );
-      }
-      continue;
-    }
+    // no futher checks at the moment.
 
-    // this check applies to all cases - the merged features
-    // have to be reasonably close.
-    const anyAreFarAway = features.some(
-      (f) =>
-        distanceBetween(features[0]!.lat, features[0]!.lng, f.lat, f.lng) >
-        10_000,
-    );
-    if (anyAreFarAway) {
-      // It's possible that the location used to be the same, but
-      // then the NZGB fixed the location on one node. In which case
-      // they should not be merged
-      warnings.push(`Refusing to merge ${refs} since they are too far apart`);
-      continue;
-    }
+    // We take everything from  the first ref in the list, merging only
+    // a few selective props.
+    const properties: NZGBFeature = {
+      ...features[0]!,
+      ref: mergedRef,
+      altNames: [...new Set(features.flatMap((f) => f.altNames || []))],
+      oldNames: [...new Set(features.flatMap((f) => f.oldNames || []))],
+      oldRefs: [...new Set(features.flatMap((f) => f.oldRefs || []))],
+    };
+    const merged: NZGBFeatureGeoJson = {
+      type: 'Feature',
+      geometry: {
+        type: 'Point',
+        coordinates: [properties.lng, properties.lat],
+      },
+      properties,
+    };
+    return { merged, warnings };
+  } else {
+    // some of the merged features have different names.
 
-    // a common example is "Mt X" and "X Mountain" coëxisting, so we
-    // strip out prefixes and suffixes per comparing names.
-    const uniqueNames = new Set(
-      features.map((f) => removeEnglishPrefixesAndSuffixes(f.name)),
-    );
+    // the "main" features is what we keep. This is the official name
+    // if one of the names is official, otherwise it's the first ref
+    const mainFeature = features.find((f) => f.official) || features[0]!;
 
-    if (uniqueNames.size === 1) {
-      // all the merged features have the same name. This is the easy case
+    // reference equality is safe here
+    const nonMainFeatures = features.filter((f) => f !== mainFeature);
 
-      // no futher checks at the moment.
-
-      // We take everything from  the first ref in the list, merging only
-      // a few selective props.
-      nzgb[mergedRef] = {
-        ...features[0]!,
-        altNames: [...new Set(features.flatMap((f) => f.altNames || []))],
-        oldNames: [...new Set(features.flatMap((f) => f.oldNames || []))],
-        oldRefs: [...new Set(features.flatMap((f) => f.oldRefs || []))],
-      };
-      for (const ref of refs) delete nzgb[ref];
-      trivialMerges++;
-    } else {
-      // some of the merged features have different names.
-
-      // the "main" features is what we keep. This is the official name
-      // if one of the names is official, otherwise it's the first ref
-      const mainFeature = features.find((f) => f.official) || features[0]!;
-
-      // reference equality is safe here
-      const nonMainFeatures = features.filter((f) => f !== mainFeature);
-
-      // non-main names are the names from all the non-main features.
-      // these names have to go in alt_name
-      const nonMainNames = nonMainFeatures
-        .map((f) => f.name)
-        .filter(
-          (name) =>
-            name !==
-            mainFeature.name.normalize('NFD').replaceAll(/\p{Diacritic}/gu, ''),
-        );
-
-      warnings.push(
-        `Accepting “${mainFeature.name}” over “${nonMainNames.join(' & ')}”`,
+    // non-main names are the names from all the non-main features.
+    // these names have to go in alt_name
+    const nonMainNames = nonMainFeatures
+      .map((f) => f.name)
+      .filter(
+        (name) =>
+          name !==
+          mainFeature.name.normalize('NFD').replaceAll(/\p{Diacritic}/gu, ''),
       );
 
-      nzgb[mergedRef] = {
-        ...mainFeature,
-        altNames: [
-          ...new Set([
-            ...features.flatMap((f) => f.altNames || []),
-            ...nonMainNames,
-          ]),
-        ],
-        oldNames: [...new Set(features.flatMap((f) => f.oldNames || []))],
-        oldRefs: [...new Set(features.flatMap((f) => f.oldRefs || []))],
-      };
-      for (const ref of refs) delete nzgb[ref];
-    }
-  }
+    warnings.push(
+      `Accepting “${mainFeature.name}” over “${nonMainNames.join(' & ')}”`,
+    );
 
-  console.log(`Accepted ${trivialMerges} trivial merges`);
-  return { warnings };
+    const properties: NZGBFeature = {
+      ...mainFeature,
+      ref: mergedRef,
+      altNames: [
+        ...new Set([
+          ...features.flatMap((f) => f.altNames || []),
+          ...nonMainNames,
+        ]),
+      ],
+      oldNames: [...new Set(features.flatMap((f) => f.oldNames || []))],
+      oldRefs: [...new Set(features.flatMap((f) => f.oldRefs || []))],
+    };
+    const merged: NZGBFeatureGeoJson = {
+      type: 'Feature',
+      geometry: {
+        type: 'Point',
+        coordinates: [properties.lng, properties.lat],
+      },
+      properties,
+    };
+    return { merged, warnings };
+  }
 }

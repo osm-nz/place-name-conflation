@@ -4,15 +4,13 @@
   "type": "module",
   "homepage": "https://osm-nz.github.io/place-name-conflation",
   "packageManager": "yarn@4.2.1",
-  "workspaces": [
-    "client"
-  ],
   "scripts": {
     "start": "node --import tsx src/main",
     "lint": "eslint . && tsc",
     "test": "vitest"
   },
   "dependencies": {
+    "@osm-conflation-engine/cli": "^3.5.1",
     "csv-parser": "^3.2.0",
     "typescript": "^5.9.3"
   },

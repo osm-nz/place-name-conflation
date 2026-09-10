@@ -1,15 +1,20 @@
 import { createReadStream } from 'node:fs';
 import csv from 'csv-parser';
 import { NZGB_NAME_TYPES, type NameType } from '../core/data/presets.js';
-import type { RawNzgb, Ref, TransformedNzgb } from '../core/types/nzgb.def.js';
+import type {
+  NZGBFeatureGeoJson,
+  RawNzgb,
+  Ref,
+  TransformedNzgb,
+} from '../core/types/nzgb.def.js';
 import { nzgbRawPath } from '../core/constants.js';
 import type { Config } from '../core/types/general.def.js';
 
 export type TempName = {
   name: string;
   ref: number;
-  /** Oficicial, replaced, or unofficial */
-  status: 'O' | 'R' | 'U';
+  /** Oficicial, replaced, discontinued, or unofficial */
+  status: 'O' | 'R' | 'D' | 'U';
   teReo: boolean;
 };
 type TempObject = {
@@ -47,9 +52,6 @@ async function csvToTemp(): Promise<{ out: TempObject }> {
         if (!(index % 1000)) process.stdout.write('.');
         index += 1;
 
-        // "Discontinued" don't exist or completely irrelevant
-        if (data.status.endsWith('Discontinued')) return;
-
         /** cause of the BOM character at the start of the csv file we do this */
         const ref = +(data.name_id || data['\uFEFFname_id' as 'name_id']);
 
@@ -69,7 +71,9 @@ async function csvToTemp(): Promise<{ out: TempObject }> {
             ? 'O'
             : data.status === 'Unofficial Replaced'
               ? 'R'
-              : 'U',
+              : data.status.endsWith('Discontinued')
+                ? 'D'
+                : 'U',
           teReo: data.maori_name === 'Yes',
         });
       })
@@ -90,7 +94,21 @@ async function tempToFinal(temp: TempObject, config: Config) {
       throw new Error(`(!) Unexpected type '${place.type}'`);
     }
 
-    if (place.names.some((x) => x.ref in config.ignore)) continue;
+    // store discontinued names
+    for (const { name, ref: subRef, status } of place.names) {
+      if (status === 'D') {
+        out[subRef as never] = {
+          ref: `${subRef}`,
+          lat: place.lat,
+          lng: place.lng,
+          type: place.type,
+          name,
+          discontinued: true,
+          isArea: place.isArea,
+          isUndersea: place.isUndersea,
+        };
+      }
+    }
 
     const officialNames = place.names
       .filter((x) => x.status === 'O')
@@ -121,6 +139,7 @@ async function tempToFinal(temp: TempObject, config: Config) {
       }
 
       out[ref] = {
+        ref,
         lat: place.lat,
         lng: place.lng,
         type: place.type,
@@ -155,6 +174,7 @@ async function tempToFinal(temp: TempObject, config: Config) {
         .filter((x) => !name.includes(x.name)); // remove oldNames which are just subsets of the official name
 
       out[ref] = {
+        ref,
         lat: place.lat,
         lng: place.lng,
         type: place.type,
@@ -176,10 +196,20 @@ async function tempToFinal(temp: TempObject, config: Config) {
   return out;
 }
 
-export async function transformNzgb(_: number, config: Config) {
+export async function transformNzgb(
+  _: number,
+  config: Config,
+): Promise<NZGBFeatureGeoJson[]> {
   console.log('Preprocessing NZGB data...');
   const temp = await csvToTemp();
   const result = await tempToFinal(temp.out, config);
 
-  return result;
+  return Object.values(result).map(
+    (f): NZGBFeatureGeoJson => ({
+      type: 'Feature',
+      id: f.ref,
+      geometry: { type: 'Point', coordinates: [f.lng, f.lat] },
+      properties: f,
+    }),
+  );
 }

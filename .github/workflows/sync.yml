@@ -40,19 +40,11 @@ jobs:
         run: |
           yarn start
 
-      # we have to deploy the client & data together, so
-      # rebuild the client
-      - name: 🛠 Build Client
-        id: build
-        run: |
-          cd client
-          yarn build
-
       - name: 🚀 Upload dist folder
         id: deployment
         uses: actions/upload-pages-artifact@v3
         with:
-          path: client/dist/
+          path: output/
 
   deploy:
     environment:

@@ -1,6 +1,6 @@
-import type { OsmPatch } from 'osm-api';
-import { CHANGESET_TAGS, USER_AGNET } from '../core/constants.js';
-import { WARNING, type Warnings } from '../core/types/output.def.js';
+import type { OsmPatchFeature } from 'osm-api';
+import type { ConflationResultExtra } from '@osm-conflation-engine/cli';
+import { USER_AGNET } from '../core/constants.js';
 import { OSM_TYPES } from '../core/types/osm.def.js';
 import { wikidataErrors } from './compareFeatures/compareFeatures.js';
 
@@ -17,13 +17,12 @@ export const osmIdToLink = (osmId: string) =>
 export const qIdToLink = (qId: string) =>
   `<a href='https://wikidata.org/wiki/${qId}' target='_blank'>${qId}</a>`;
 
-export async function checkWikidataRedirects(
-  warnings: Warnings,
-): Promise<OsmPatch> {
+export async function checkWikidataRedirects(): Promise<ConflationResultExtra> {
   console.log(
     `🔵 Checking ${wikidataErrors.length} invalid wikidata tags for redirects…`,
   );
 
+  const warnings: string[] = [];
   const byOldQId = Object.fromEntries(
     wikidataErrors.map((error) => [error.actual, error]),
   );
@@ -51,35 +50,29 @@ export async function checkWikidataRedirects(
   );
   for (const entity of nonRedirectIssues) {
     const error = byOldQId[entity.id]!;
-    warnings[WARNING.NON_REDIRECT_WIKIDATA_ERROR] ||= [];
-    warnings[WARNING.NON_REDIRECT_WIKIDATA_ERROR].push(
+    warnings.push(
       `Expected ${qIdToLink(error.expected)} on ${osmIdToLink(error.osmId)}, not ${qIdToLink(error.actual)}`,
     );
   }
 
-  const patchFile: OsmPatch = {
-    type: 'FeatureCollection',
-    features: redirects.map(([from, to]) => {
-      const error = byOldQId[from!]!;
-      return {
-        type: 'Feature',
-        id: error.osmId,
-        geometry: {
-          type: 'Point',
-          coordinates: [error.lng, error.lat],
-        },
-        properties: {
-          __action: 'edit',
-          wikidata: to!,
-        },
-      };
-    }),
-    size: 'large',
-    changesetTags: {
-      ...CHANGESET_TAGS,
-      comment: 'update wikidata tags which point to redirect pages',
-    },
-  };
+  const features: OsmPatchFeature[] = redirects.map(([from, to]) => {
+    const error = byOldQId[from!]!;
+    return {
+      type: 'Feature',
+      id: error.osmId,
+      geometry: {
+        type: 'Point',
+        coordinates: [error.lng, error.lat],
+      },
+      properties: {
+        __action: 'edit',
+        wikidata: to!,
+      },
+    };
+  });
 
-  return patchFile;
+  return {
+    extraFeatures: features,
+    warnings,
+  };
 }

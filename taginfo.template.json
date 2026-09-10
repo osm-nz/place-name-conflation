@@ -18,6 +18,11 @@
       "description": "The ID of a place in the New Zealand Gazetteer. Used to conflate place names around New Zealand & Antarctica"
     },
     {
+      "key": "check_date:name",
+      "object_types": ["node", "way", "area", "relation"],
+      "description": "If a feature has this tag, and it is set to a recent date, then the conflation process will not report any errors for this feature."
+    },
+    {
       "key": "name",
       "object_types": ["node", "way", "area", "relation"]
     },
