@@ -12,10 +12,10 @@ type WikidataApiResponse = {
 };
 
 export const osmIdToLink = (osmId: string) =>
-  `<a href='https://osm.org/${OSM_TYPES[osmId[0]!]}/${osmId.slice(1)}' target='_blank'>${osmId}</a>`;
+  `[${osmId}](https://osm.org/${OSM_TYPES[osmId[0]!]}/${osmId.slice(1)})`;
 
 export const qIdToLink = (qId: string) =>
-  `<a href='https://wikidata.org/wiki/${qId}' target='_blank'>${qId}</a>`;
+  `[${qId}](https://wikidata.org/wiki/${qId})`;
 
 export async function checkWikidataRedirects(): Promise<ConflationResultExtra> {
   console.log(

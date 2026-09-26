@@ -6,6 +6,7 @@ import type {
   NZGBFeatureGeoJson,
 } from '../core/types/nzgb.def.js';
 import { removeEnglishPrefixesAndSuffixes } from './removeEnglishPrefixesAndSuffixes.js';
+import { osmIdToLink } from './checkWikidataRedirects.js';
 
 /**
  * The NZGB has duplicate entries, so this function
@@ -44,7 +45,9 @@ export function applyCustomMerges(
   const features = nzgbSorted.map((f) => f.properties);
 
   if (osmRefs.some((ref) => !nzgbByRef[ref])) {
-    warnings.push(`Invalid refs: ${osm.tags[REF]} --> ${mergedRef}`);
+    warnings.push(
+      `Invalid refs (${osmIdToLink(osm.id)}): ${osm.tags[REF]} --> ${mergedRef}`,
+    );
     // in this case, we suggest removing the refs that don't exist
     // anymore. Most likely cause is that the NZGB has noticed the
     // duplicates and deleted one of them.
@@ -61,7 +64,9 @@ export function applyCustomMerges(
     // It's possible that the location used to be the same, but
     // then the NZGB fixed the location on one node. In which case
     // they should not be merged
-    warnings.push(`Refusing to merge ${refs} since they are too far apart`);
+    warnings.push(
+      `Refusing to merge ${refs} since they are too far apart (${osmIdToLink(osm.id)})`,
+    );
     return { merged: undefined, warnings };
   }
 
@@ -115,7 +120,7 @@ export function applyCustomMerges(
       );
 
     warnings.push(
-      `Accepting “${mainFeature.name}” over “${nonMainNames.join(' & ')}”`,
+      `Accepting “${mainFeature.name}” over “${nonMainNames.join(' & ')}” on ${osmIdToLink(osm.id)}`,
     );
 
     const properties: NZGBFeature = {
