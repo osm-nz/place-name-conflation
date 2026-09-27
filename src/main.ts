@@ -43,7 +43,7 @@ const conflationConfig: Config = {
     type: 'file',
     file: SOURCE_FILE,
   },
-  o_data: {
+  osm_data: {
     source: {
       type: 'postpass',
       // postpass_query_file is not specified, so it'll default to downloading everything with ref:doc
