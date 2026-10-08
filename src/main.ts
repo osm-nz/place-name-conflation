@@ -26,6 +26,8 @@ import { checkWikidataRedirects } from './conflate/checkWikidataRedirects.js';
 import { conflateItem } from './conflate/index.js';
 import { applyCustomMerges } from './conflate/applyCustomMerges.js';
 
+const taginfo = generateTaginfoFile();
+
 const SOURCE_FILE = join(import.meta.dirname, '../tmp/nzgb-merged.jsonl');
 
 const conflationConfig: Config = {
@@ -33,11 +35,12 @@ const conflationConfig: Config = {
     'https://unpkg.com/@osm-conflation-engine/cli/dist/config.schema.json',
   metadata: {
     region: 'NZ',
-    name: 'NZGB Place Names',
+    name: taginfo.project.name,
     description:
       'Names of localities and natural features from the New Zealand Geographic Board (Ngā Pou Taunaha o Aotearoa) Gazetteer',
-    git_repository: 'https://github.com/osm-nz/place-name-conflation',
-    wiki_page: 'https://wiki.osm.org/Import/New_Zealand_Place_Names',
+    wiki_page: taginfo.project.doc_url!,
+    taginfo_project_url: taginfo.data_url,
+    license_waiver_url: 'https://osm.wiki/File:LINZ_OSM-CC-4.0_waiver.pdf',
   },
   source_data: {
     type: 'file',
@@ -165,8 +168,6 @@ async function main() {
     },
     { use_cache: true },
   );
-
-  const taginfo = generateTaginfoFile();
 
   await fs.mkdir(dirname(taginfoOutputFile), { recursive: true });
   await fs.writeFile(taginfoOutputFile, JSON.stringify(taginfo, null, 2));

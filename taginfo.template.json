@@ -4,7 +4,7 @@
   "data_updated": "20230105T000000Z",
   "project": {
     "name": "New Zealand Place Names",
-    "description": "Tags used by the New Zealand Place Names project, which regularly updates addresses in OSM based on data from the New Zealand Geographic Board (Ngā Pou Taunaha o Aotearoa).",
+    "description": "Tags used by the New Zealand Place Names project, which regularly updates tags in OSM based on data from the New Zealand Geographic Board (Ngā Pou Taunaha o Aotearoa).",
     "project_url": "https://github.com/osm-nz/place-name-conflation",
     "doc_url": "https://wiki.osm.org/Import/New_Zealand_Place_Names",
     "icon_url": "https://osm-nz.github.io/img/logo.png",

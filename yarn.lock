@@ -870,18 +870,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@osm-conflation-engine/cli@npm:^3.9.0":
-  version: 3.9.0
-  resolution: "@osm-conflation-engine/cli@npm:3.9.0"
+"@osm-conflation-engine/cli@npm:^3.12.0":
+  version: 3.12.0
+  resolution: "@osm-conflation-engine/cli@npm:3.12.0"
   dependencies:
     "@actions/core": "npm:^3.0.1"
     ajv: "npm:^8.20.0"
     d3-geo: "npm:^3.1.1"
     h3-js: "npm:^4.4.0"
-    osm-api: "npm:^4.0.0"
-    pbf2json: "git+https://github.com/osm-nz/pbf2json.git"
+    osm-api: "npm:^4.0.1"
+    pbf2json: "https://github.com/osm-nz/pbf2json"
     protobufjs: "npm:^8.6.5"
-  checksum: 10c0/9506dcb517423af16ad774402a2942a4412be8713452bee99ee100408bb11a2ca0e943a187d2b8b096e0fb69b377d9c17544c8c68b54881c86c5669f0f435ba2
+    tag2link: "npm:latest"
+  checksum: 10c0/3ade105d1d17b00004a310f622eb6c48998daf7d5b918a75dd8726e6810f147044a843914daa5e45e1edebc0db1ff1a899236f8e813638e2179bd2ba87a831ff
   languageName: node
   linkType: hard
 
@@ -4156,13 +4157,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"osm-api@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "osm-api@npm:4.0.0"
+"osm-api@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "osm-api@npm:4.0.1"
   dependencies:
     "@types/geojson": "npm:^7946.0.13"
     fast-xml-parser: "npm:^4.4.1"
-  checksum: 10c0/6d0802e2da4b50ed9b4898db41a4b1eb9f2fc6754f8a215270fdb38b4571a44085283218047e5c709ca54b6843c35e65224fa4b5fb91d06d4808322f1e9831d9
+  checksum: 10c0/a76284c553b1dcb89c814b7ea347db81d08ce200b20fcaf921c5f488721f44faff7a42c542dd39da6eee40dea77c5da5e1078aeeb53e2d6e00527abfc9ff5d1a
   languageName: node
   linkType: hard
 
@@ -4240,7 +4241,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pbf2json@git+https://github.com/osm-nz/pbf2json.git":
+"pbf2json@https://github.com/osm-nz/pbf2json":
   version: 0.0.0-development
   resolution: "pbf2json@https://github.com/osm-nz/pbf2json.git#commit=c275a7beeabe553f0878ddba3a31ef902d2b8ca0"
   dependencies:
@@ -4275,7 +4276,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "place-name-conflation@workspace:."
   dependencies:
-    "@osm-conflation-engine/cli": "npm:^3.9.0"
+    "@osm-conflation-engine/cli": "npm:^3.12.0"
     "@types/geojson": "npm:^7946.0.16"
     "@types/node": "npm:^24.10.1"
     "@types/taginfo-projects": "github:taginfo/taginfo-projects#6daafd2e30a86a8bfb9615855af2c2d73bd98279"
@@ -4926,6 +4927,13 @@ __metadata:
   dependencies:
     "@pkgr/core": "npm:^0.2.9"
   checksum: 10c0/f0761495953d12d94a86edf6326b3a565496c72f9b94c02549b6961fb4d999f4ca316ce6b3eb8ed2e4bfc5056a8de65cda0bd03a233333a35221cd2fdc0e196b
+  languageName: node
+  linkType: hard
+
+"tag2link@npm:latest":
+  version: 2026.9.21
+  resolution: "tag2link@npm:2026.9.21"
+  checksum: 10c0/87f2f140438a3f69e6b5cfdfb53fb472cdcb7ebe6e6f17d5d1e94e2ea083777d4603ee7954061b43764531a464f78f950ee596b249c57544d7a07bc5256e485d
   languageName: node
   linkType: hard
 
