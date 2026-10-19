@@ -214,7 +214,10 @@ export function compareFeatures(
   if (nameMiDiff) tagChanges['name:mi'] = nameMiDiff;
 
   // 13. Check `name:en` for common issues (see function for more details)
-  const nameEnDiff = osm.tags['name:en'] && checkNameEn(nzgb.name, osm.tags);
+  const nameEnDiff =
+    nzgb.type !== 'Trig Station' &&
+    osm.tags['name:en'] &&
+    checkNameEn(nzgb.name, osm.tags);
   if (nameEnDiff) tagChanges['name:en'] = nameEnDiff;
 
   //
