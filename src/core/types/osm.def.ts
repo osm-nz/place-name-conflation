@@ -66,6 +66,8 @@ declare global {
         | 'route'
         | 'historic'
         | 'junction'
+        | 'geological'
+        | 'glacier:type'
         // changesets:
         | 'comment';
     }
@@ -121,6 +123,8 @@ export const ALL_KEYS: (OsmApi.Keys['keys'] | StringifiedRegExp)[] = [
   'route',
   'historic',
   'junction',
+  'geological',
+  'glacier:type',
   // changesets:
   'comment',
 ];
