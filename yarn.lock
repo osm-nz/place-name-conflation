@@ -870,9 +870,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@osm-conflation-engine/cli@npm:^3.12.0":
-  version: 3.12.0
-  resolution: "@osm-conflation-engine/cli@npm:3.12.0"
+"@osm-conflation-engine/cli@npm:^3.13.0":
+  version: 3.13.0
+  resolution: "@osm-conflation-engine/cli@npm:3.13.0"
   dependencies:
     "@actions/core": "npm:^3.0.1"
     ajv: "npm:^8.20.0"
@@ -882,7 +882,7 @@ __metadata:
     pbf2json: "https://github.com/osm-nz/pbf2json"
     protobufjs: "npm:^8.6.5"
     tag2link: "npm:latest"
-  checksum: 10c0/3ade105d1d17b00004a310f622eb6c48998daf7d5b918a75dd8726e6810f147044a843914daa5e45e1edebc0db1ff1a899236f8e813638e2179bd2ba87a831ff
+  checksum: 10c0/da3fda150261bc88b6bed67133db740c2a4ea7afb03017ba8e4cf898750d4e06b6f0501207fc21c67d11f9d46b34dabccfefa82d0bac670475656b9dea22e1d7
   languageName: node
   linkType: hard
 
@@ -4276,7 +4276,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "place-name-conflation@workspace:."
   dependencies:
-    "@osm-conflation-engine/cli": "npm:^3.12.0"
+    "@osm-conflation-engine/cli": "npm:^3.13.0"
     "@types/geojson": "npm:^7946.0.16"
     "@types/node": "npm:^24.10.1"
     "@types/taginfo-projects": "github:taginfo/taginfo-projects#6daafd2e30a86a8bfb9615855af2c2d73bd98279"
