@@ -48,8 +48,10 @@ const conflationConfig: Config = {
   },
   osm_data: {
     source: {
-      type: 'postpass',
-      // postpass_query_file is not specified, so it'll default to downloading everything with ref:doc
+      type: 'overpass',
+      // overpass_query_file is not specified, so it'll default to downloading everything with ref:doc
+      overpass_server_url:
+        'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
     },
     tags_to_keep: ALL_KEYS,
     check_date_key: 'check_date:name',
